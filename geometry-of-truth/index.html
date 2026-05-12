@@ -207,6 +207,49 @@
     font-family: Georgia, serif;
   }
 
+  /* flowchart */
+  .flowchart { margin: 20px 0; display: flex; flex-direction: column; align-items: stretch; }
+  .fc-step {
+    background: var(--paper-deep);
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 14px 20px;
+  }
+  .fc-num {
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-size: 15px;
+    color: var(--cobalt);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .fc-title {
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .fc-body { font-size: 17px; line-height: 1.6; color: var(--ink); }
+  .fc-mono { font-family: 'SF Mono', Menlo, monospace; font-size: 15px; color: var(--cobalt-deep); }
+  .fc-arrow {
+    text-align: center;
+    font-size: 28px;
+    color: var(--cobalt);
+    margin: 6px 0;
+    line-height: 1;
+  }
+  .fc-warn {
+    background: var(--paper);
+    border-left: 5px solid var(--cobalt);
+    border-top: 1px solid var(--ink);
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+
   /* shared viz styles */
   .viz {
     background: var(--paper-deep);
@@ -577,6 +620,72 @@
 <section id="lesson3" class="lesson">
   <h2>Lesson 3 — Finding the truth direction</h2>
   <p class="lead">Now that we know <i>where</i> the model stores truth (a single hidden state vector per sentence), we can ask: what does the geometry of those vectors look like?</p>
+
+  <h3 class="subhead">From words to a PCA plot — the full pipeline</h3>
+  <p>Before diving into probes, here's how the dataset of activations is built — and why PCA can show you "truth" without ever being told the labels.</p>
+
+  <div class="flowchart">
+    <div class="fc-step">
+      <div class="fc-num">Step 1</div>
+      <div class="fc-title">Tokenize the sentence</div>
+      <div class="fc-body">
+        <div class="fc-mono">"The city of Toronto is in Canada ."</div>
+        <div class="fc-mono" style="margin-top:6px;">→ [t₀] [t₁] [t₂] [t₃] [t₄] [t₅] [t₆] [t₇=.]</div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+
+    <div class="fc-step">
+      <div class="fc-num">Step 2</div>
+      <div class="fc-title">Forward pass → hidden states at every (token, layer)</div>
+      <div class="fc-body">
+        Causal attention: token <i>i</i> can only see tokens 0..<i>i</i>.<br>
+        Only the <b>last token</b> has read the whole sentence.
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+
+    <div class="fc-step">
+      <div class="fc-num">Step 3</div>
+      <div class="fc-title">Grab ONE vector per sentence</div>
+      <div class="fc-body">
+        Take the hidden state at the EOS "." token, middle layer:<br>
+        <div class="fc-mono" style="margin-top:6px;">h<sub>EOS</sub> ∈ ℝ<sup>5120</sup>  — just one vector, not many</div>
+        <div style="margin-top:8px;">Why this slot? It has seen everything (causal mask) and "." carries no word-meaning, so the vector isn't dominated by lexical content.</div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+
+    <div class="fc-step">
+      <div class="fc-num">Step 4</div>
+      <div class="fc-title">Repeat across many sentences — one vector per sentence</div>
+      <div class="fc-body">
+        <div class="fc-mono">"Toronto is in Canada."  →  h<sub>EOS</sub><sup>(1)</sup>  (true)</div>
+        <div class="fc-mono">"Chicago is in Canada."  →  h<sub>EOS</sub><sup>(2)</sup>  (false)</div>
+        <div class="fc-mono">"Paris is in France."    →  h<sub>EOS</sub><sup>(3)</sup>  (true)</div>
+        <div class="fc-mono">"Berlin is in Italy."    →  h<sub>EOS</sub><sup>(4)</sup>  (false)</div>
+        <div class="fc-mono">...</div>
+        <div style="margin-top:8px;">Stack them → matrix <b>X ∈ ℝ<sup>N × 5120</sup></b> (N rows, one per sentence).</div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+
+    <div class="fc-step">
+      <div class="fc-num">Step 5</div>
+      <div class="fc-title">PCA on X → axes of greatest variance</div>
+      <div class="fc-body">
+        <div class="fc-warn">⚠ PCA is <b>not</b> clustering. It's unsupervised dimensionality reduction — it doesn't know which sentences are true or false. It just asks: <i>"what directions vary the most?"</i></div>
+        Project 5120 dims → 2 dims you can plot. The fact that true and false sentences <b>happen</b> to fall on opposite sides of PC1 is the empirical surprise — that's evidence that "truth" is a real geometric axis the model uses.
+        <div style="margin-top:8px;"><b>PC1 ≈ the truth direction θ<sub>t</sub>.</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:18px;">
+    <b>PCA vs. probes — same goal, different tools.</b><br>
+    • <b>PCA</b> (unsupervised) ignores labels and finds variance: <i>"look what shows up on its own."</i><br>
+    • <b>Probes</b> (LR / Mass-Mean / CCS, below) use labels to fit a direction: <i>"tell me which axis splits T/F."</i>
+  </div>
 
   <h3 class="subhead">What's a "truth direction"?</h3>
   <p>Inside the model, every sentence becomes a vector — a point in a high-dimensional space (5120 numbers for LLaMA-2-13B). A <b>direction</b> in that space is just an arrow (a unit vector). You can project any point onto the arrow and get a single number: "how far along it does this sentence sit?"</p>
