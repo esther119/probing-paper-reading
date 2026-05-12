@@ -3,114 +3,218 @@
 <head>
 <meta charset="UTF-8">
 <title>The Geometry of Truth — interactive curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Abril+Fatface&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
+  /* === A PARODIA (1901) — letterpress / Art Nouveau theme ===
+     paper cream, cobalt blue, ink black, serif type. */
+  :root {
+    --paper: #ece1c6;
+    --paper-deep: #e2d3b0;
+    --ink: #14110d;
+    --ink-soft: #3a342a;
+    --cobalt: #1a3a8a;
+    --cobalt-deep: #122766;
+    --cobalt-bright: #2447b3;
+    --rule: #14110d;
+  }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0f1116;
-    color: #e6e6e6;
+    font-family: Georgia, 'Iowan Old Style', 'Palatino', 'EB Garamond', serif;
+    background: var(--paper);
+    background-image:
+      radial-gradient(rgba(20,17,13,0.04) 1px, transparent 1px);
+    background-size: 5px 5px;
+    color: var(--ink);
     margin: 0;
-    line-height: 1.55;
+    line-height: 1.7;
+    font-size: 20px;
   }
+  a { color: var(--cobalt); }
 
   /* layout */
   .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px 80px; }
   header.hero {
-    border-bottom: 1px solid #262b36;
-    padding: 38px 28px 24px;
-    background: linear-gradient(180deg, #161a22 0%, #0f1116 100%);
+    border-top: 6px double var(--ink);
+    border-bottom: 6px double var(--ink);
+    padding: 28px 28px 22px;
+    background: var(--paper);
+    text-align: center;
+    margin: 14px 14px 0;
   }
-  header.hero .inner { max-width: 1200px; margin: 0 auto; }
-  header.hero h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: -0.5px; }
-  header.hero .tag { color: #fbbf24; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-  header.hero p { color: #c0c5d0; font-size: 15px; max-width: 800px; margin: 0; }
+  header.hero .inner { max-width: 1100px; margin: 0 auto; }
+  header.hero .tag {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.hero h1 {
+    margin: 0 0 14px;
+    font-family: 'Abril Fatface', 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 76px;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    color: var(--cobalt);
+    text-shadow: 1px 1px 0 rgba(20,17,13,0.08);
+  }
+  header.hero h1 em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.55em;
+    display: block;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  header.hero p {
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    font-family: Georgia, serif;
+  }
+  header.hero .masthead-rule {
+    display: flex; justify-content: center; align-items: center;
+    gap: 18px; margin: 14px 0 12px;
+    font-family: 'EB Garamond', serif; font-style: italic;
+    color: var(--ink-soft); font-size: 13px;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  header.hero .masthead-rule::before,
+  header.hero .masthead-rule::after {
+    content: ""; height: 1px; background: var(--ink); flex: 1; max-width: 140px;
+  }
 
   nav.toc {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: rgba(15, 17, 22, 0.92);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid #262b36;
-    padding: 10px 28px;
+    background: var(--paper-deep);
+    border-bottom: 3px double var(--ink);
+    border-top: 1px solid var(--ink);
+    padding: 8px 28px;
+    margin: 0 14px;
   }
   nav.toc .inner {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    gap: 18px;
+    gap: 22px;
     flex-wrap: wrap;
-    font-size: 13px;
+    font-size: 16px;
+    justify-content: center;
+    font-family: Georgia, serif;
+    font-variant: small-caps;
+    letter-spacing: 1px;
   }
   nav.toc a {
-    color: #9aa0aa;
+    color: var(--ink);
     text-decoration: none;
-    border-bottom: 1px dashed transparent;
+    border-bottom: 1px solid transparent;
   }
-  nav.toc a:hover { color: #fbbf24; border-bottom-color: #fbbf24; }
+  nav.toc a:hover { color: var(--cobalt); border-bottom-color: var(--cobalt); }
   nav.toc .num {
     display: inline-block;
-    background: #2a2f3a;
-    color: #c0c5d0;
-    border-radius: 999px;
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
+    background: var(--cobalt);
+    color: var(--paper);
+    border-radius: 0;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
     text-align: center;
-    font-size: 11px;
-    margin-right: 5px;
+    font-size: 12px;
+    font-family: 'Abril Fatface', serif;
+    margin-right: 6px;
   }
 
   section.lesson {
-    margin-top: 48px;
-    scroll-margin-top: 60px;
+    margin-top: 56px;
+    scroll-margin-top: 70px;
+    padding: 0 14px;
   }
   section.lesson h2 {
-    font-size: 24px;
-    margin: 0 0 4px;
-    color: #fbbf24;
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 44px;
+    margin: 0 0 10px;
+    color: var(--cobalt);
+    letter-spacing: -0.5px;
+    border-bottom: 3px double var(--ink);
+    padding-bottom: 12px;
+    line-height: 1.15;
   }
   section.lesson .lead {
-    color: #c0c5d0;
-    font-size: 14px;
-    margin-bottom: 18px;
+    color: var(--ink);
+    font-size: 21px;
+    font-style: italic;
+    margin-bottom: 22px;
+    font-family: Georgia, serif;
+    line-height: 1.55;
   }
-  section.lesson p { color: #c0c5d0; font-size: 14.5px; }
-  section.lesson p b { color: #e6e6e6; }
+  section.lesson p { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson p b { color: var(--cobalt-deep); font-weight: 700; }
   section.lesson h3.subhead {
-    margin: 24px 0 8px;
-    font-size: 16px;
-    color: #e6e6e6;
+    margin: 30px 0 12px;
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--ink);
+    letter-spacing: 0.5px;
   }
+  section.lesson ul, section.lesson ol { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson li { margin-bottom: 10px; }
 
   .takeaway {
-    background: #1e293b;
-    border-left: 3px solid #fbbf24;
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-size: 13.5px;
-    margin: 18px 0;
+    background: var(--cobalt);
+    color: var(--paper);
+    border: none;
+    border-top: 4px solid var(--ink);
+    border-bottom: 4px solid var(--ink);
+    padding: 18px 22px;
+    border-radius: 0;
+    font-size: 19px;
+    line-height: 1.65;
+    margin: 24px 0;
+    font-family: Georgia, serif;
   }
-  .takeaway b { color: #fbbf24; }
+  .takeaway b {
+    color: var(--paper);
+    font-variant: small-caps;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+  }
 
   .callout {
-    background: #161a22;
-    border: 1px solid #262b36;
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    color: #c0c5d0;
-    margin: 14px 0;
+    background: var(--paper-deep);
+    border: 1px solid var(--ink);
+    border-left: 6px solid var(--cobalt);
+    border-radius: 0;
+    padding: 16px 20px;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 18px 0;
+    font-style: italic;
+    font-family: Georgia, serif;
   }
 
   /* shared viz styles */
   .viz {
-    background: #161a22;
-    border: 1px solid #262b36;
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin: 16px 0;
+    background: var(--paper-deep);
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    padding: 18px 20px;
+    margin: 18px 0;
+    box-shadow: 4px 4px 0 var(--ink);
   }
   .viz-row {
     display: grid;
@@ -123,36 +227,53 @@
     .viz-row, .viz-row.two { grid-template-columns: 1fr; }
   }
   .panel {
-    background: #0c0e13;
-    border: 1px solid #1f242f;
-    border-radius: 10px;
-    padding: 12px 14px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 0;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
   }
-  .panel h4 { margin: 0 0 6px; font-size: 13px; }
+  .panel h4 {
+    margin: 0 0 10px;
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--cobalt);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+  }
   .legend {
     display: flex;
-    gap: 12px;
-    font-size: 11px;
-    color: #9aa0aa;
-    margin-top: 8px;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 12px;
     flex-wrap: wrap;
+    font-family: Georgia, serif;
+    font-style: italic;
   }
-  .legend span { display: inline-flex; align-items: center; gap: 5px; }
-  .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 0; display: inline-block; border: 1px solid var(--ink); }
   button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 7px 14px;
-    border-radius: 6px;
+    background: var(--cobalt);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 7px 16px;
+    border-radius: 0;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
+    font-family: 'EB Garamond', serif;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform .08s, box-shadow .08s;
   }
-  button:hover { background: #1d4ed8; }
-  button.ghost { background: #2a2f3a; }
-  button.ghost:hover { background: #353b48; }
+  button:hover { background: var(--cobalt-bright); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+  button:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+  button.ghost { background: var(--paper); color: var(--ink); }
+  button.ghost:hover { background: var(--paper-deep); }
 
   /* === LESSON 1: token viz === */
   #tv-tokens { display: flex; gap: 6px; justify-content: center; margin: 18px 0 8px; flex-wrap: wrap; }
@@ -204,9 +325,15 @@
   .pill.good { background: #14532d; color: #86efac; }
   .pill.bad  { background: #5a1e1e; color: #fca5a5; }
   .narration {
-    background: #1e293b; border-left: 3px solid #fbbf24;
-    padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-top: 12px;
+    background: var(--paper-deep);
+    border: 1px solid var(--ink);
+    border-left: 5px solid var(--cobalt);
+    padding: 14px 16px; border-radius: 0;
+    font-size: 17px; line-height: 1.6; margin-top: 14px;
+    color: var(--ink);
+    font-family: Georgia, serif;
   }
+  .narration b { color: var(--cobalt-deep); font-variant: small-caps; letter-spacing: 1px; }
 
   /* === LESSON 2: swap viz === */
   .sv-prompt {
@@ -214,7 +341,7 @@
     margin-bottom: 10px; padding: 6px 8px; background: #0c0e13; border-radius: 4px;
   }
   .sv-prompt b { color: #fbbf24; }
-  .sv-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; flex: 1; min-height: 0; }
+  .sv-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; flex: 1; min-height: 0; min-width: 0; width: 100%; }
   .sv-cell {
     aspect-ratio: 1; border-radius: 4px; background: #1f242f;
     border: 1px solid #2c323e; cursor: pointer; transition: all 0.15s; position: relative;
@@ -243,7 +370,7 @@
   .verdict.true { color: #4ade80; }
   .verdict.false { color: #f87171; }
   .verdict.flipped { color: #fbbf24; }
-  .sv-heatmap { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; flex: 1; min-height: 0; }
+  .sv-heatmap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; flex: 1; min-height: 0; min-width: 0; width: 100%; }
   .sv-hcell {
     aspect-ratio: 1; border-radius: 3px; font-size: 9px;
     display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5);
@@ -253,25 +380,30 @@
   canvas#pv-scatter { width: 100%; aspect-ratio: 1.1 / 1; background: #0c0e13; border-radius: 8px; display: block; }
   canvas#pv-proj1d { width: 100%; height: 80px; background: #0c0e13; border-radius: 8px; display: block; margin-top: 8px; }
   .proj-caption { font-size: 11px; color: #6b7280; margin-top: 4px; text-align: center; font-style: italic; }
-  .controls { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
-  .ctrl-row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-  .ctrl-row label { color: #c0c5d0; flex: 1; }
-  .ctrl-row input[type=range] { flex: 1.5; }
-  .ctrl-row .val { font-family: 'SF Mono', Menlo, monospace; font-size: 12px; color: #9aa0aa; min-width: 36px; text-align: right; }
+  .controls { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+  .ctrl-row { display: flex; align-items: center; gap: 12px; font-size: 16px; }
+  .ctrl-row label { color: var(--ink); flex: 1; font-family: Georgia, serif; }
+  .ctrl-row input[type=range] { flex: 1.5; accent-color: var(--cobalt); }
+  .ctrl-row .val { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: var(--cobalt-deep); font-weight: 700; min-width: 40px; text-align: right; }
   .method {
-    display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px;
-    border: 1px solid #2c323e; border-radius: 8px; cursor: pointer;
-    transition: all 0.15s; margin-bottom: 8px;
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px;
+    border: 1.5px solid var(--ink); border-radius: 0; cursor: pointer;
+    background: var(--paper);
+    transition: all 0.15s; margin-bottom: 10px;
   }
-  .method:hover { border-color: #4a5160; }
-  .method.active { background: #1e293b; border-color: #fbbf24; }
+  .method:hover { background: var(--paper-deep); }
+  .method.active { background: var(--cobalt); border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .method.active .name,
+  .method.active .desc,
+  .method.active .err { color: var(--paper); }
   .method .dot {
-    width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
+    width: 14px; height: 14px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+    border: 1.5px solid var(--ink);
   }
   .method .body { flex: 1; }
-  .method .name { font-weight: 600; font-size: 13px; }
-  .method .desc { color: #9aa0aa; font-size: 11px; margin-top: 2px; }
-  .method .err { margin-top: 4px; font-family: 'SF Mono', Menlo, monospace; font-size: 11px; }
+  .method .name { font-weight: 700; font-size: 17px; color: var(--ink); font-family: Georgia, serif; }
+  .method .desc { color: var(--ink-soft); font-size: 14px; margin-top: 3px; font-family: Georgia, serif; }
+  .method .err { margin-top: 6px; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--cobalt-deep); font-weight: 700; }
   .line-swatch { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
   .toggle-row {
     display: flex; align-items: center; gap: 8px; font-size: 12px;
@@ -284,10 +416,11 @@
 
 <header class="hero">
   <div class="inner">
-    <div class="tag">Interactive curriculum</div>
-    <h1>The Geometry of Truth in LLMs</h1>
+    <div class="tag">N.º 1 — An interactive curriculum</div>
+    <h1>The Geometry of Truth<em>— in Large Language Models —</em></h1>
+    <div class="masthead-rule">Marks &amp; Tegmark · MMXXIV</div>
     <p>A hands-on walkthrough of the central ideas in Marks &amp; Tegmark (2024). You'll go from "what is the model even doing?" to reading the model's internal truth judgments off a single number — and you'll see exactly why this works.</p>
-    <p style="margin-top:10px; font-size:14px;">📄 Paper: <a href="https://arxiv.org/html/2310.06824v3" style="color:#fbbf24;" target="_blank" rel="noopener">The Geometry of Truth: Emergent Linear Structure in LLM Representations of True/False Datasets</a> — Marks &amp; Tegmark (2024)</p>
+    <p style="margin-top:14px; font-size:15px; font-style:italic;">Paper: <a href="https://arxiv.org/html/2310.06824v3" target="_blank" rel="noopener">The Geometry of Truth: Emergent Linear Structure in LLM Representations of True/False Datasets</a></p>
   </div>
 </header>
 
