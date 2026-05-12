@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Geometry of Truth — interactive curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Abril+Fatface&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* === A PARODIA (1901) — letterpress / Art Nouveau theme ===
+     paper cream, cobalt blue, ink black, serif type. */
+  :root {
+    --paper: #ece1c6;
+    --paper-deep: #e2d3b0;
+    --ink: #14110d;
+    --ink-soft: #3a342a;
+    --cobalt: #1a3a8a;
+    --cobalt-deep: #122766;
+    --cobalt-bright: #2447b3;
+    --rule: #14110d;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: Georgia, 'Iowan Old Style', 'Palatino', 'EB Garamond', serif;
+    background: var(--paper);
+    background-image:
+      radial-gradient(rgba(20,17,13,0.04) 1px, transparent 1px);
+    background-size: 5px 5px;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.7;
+    font-size: 20px;
+  }
+  a { color: var(--cobalt); }
+
+  /* layout */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px 80px; }
+  header.hero {
+    border-top: 6px double var(--ink);
+    border-bottom: 6px double var(--ink);
+    padding: 28px 28px 22px;
+    background: var(--paper);
+    text-align: center;
+    margin: 14px 14px 0;
+  }
+  header.hero .inner { max-width: 1100px; margin: 0 auto; }
+  header.hero .tag {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.hero h1 {
+    margin: 0 0 14px;
+    font-family: 'Abril Fatface', 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 76px;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    color: var(--cobalt);
+    text-shadow: 1px 1px 0 rgba(20,17,13,0.08);
+  }
+  header.hero h1 em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.55em;
+    display: block;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  header.hero p {
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    font-family: Georgia, serif;
+  }
+  header.hero .masthead-rule {
+    display: flex; justify-content: center; align-items: center;
+    gap: 18px; margin: 14px 0 12px;
+    font-family: 'EB Garamond', serif; font-style: italic;
+    color: var(--ink-soft); font-size: 13px;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  header.hero .masthead-rule::before,
+  header.hero .masthead-rule::after {
+    content: ""; height: 1px; background: var(--ink); flex: 1; max-width: 140px;
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper-deep);
+    border-bottom: 3px double var(--ink);
+    border-top: 1px solid var(--ink);
+    padding: 8px 28px;
+    margin: 0 14px;
+  }
+  nav.toc .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    font-size: 16px;
+    justify-content: center;
+    font-family: Georgia, serif;
+    font-variant: small-caps;
+    letter-spacing: 1px;
+  }
+  nav.toc a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  nav.toc a:hover { color: var(--cobalt); border-bottom-color: var(--cobalt); }
+  nav.toc .num {
+    display: inline-block;
+    background: var(--cobalt);
+    color: var(--paper);
+    border-radius: 0;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 12px;
+    font-family: 'Abril Fatface', serif;
+    margin-right: 6px;
+  }
+
+  section.lesson {
+    margin-top: 56px;
+    scroll-margin-top: 70px;
+    padding: 0 14px;
+  }
+  section.lesson h2 {
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 44px;
+    margin: 0 0 10px;
+    color: var(--cobalt);
+    letter-spacing: -0.5px;
+    border-bottom: 3px double var(--ink);
+    padding-bottom: 12px;
+    line-height: 1.15;
+  }
+  section.lesson .lead {
+    color: var(--ink);
+    font-size: 21px;
+    font-style: italic;
+    margin-bottom: 22px;
+    font-family: Georgia, serif;
+    line-height: 1.55;
+  }
+  section.lesson p { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson p b { color: var(--cobalt-deep); font-weight: 700; }
+  section.lesson h3.subhead {
+    margin: 30px 0 12px;
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--ink);
+    letter-spacing: 0.5px;
+  }
+  section.lesson ul, section.lesson ol { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson li { margin-bottom: 10px; }
+
+  .takeaway {
+    background: var(--cobalt);
+    color: var(--paper);
+    border: none;
+    border-top: 4px solid var(--ink);
+    border-bottom: 4px solid var(--ink);
+    padding: 18px 22px;
+    border-radius: 0;
+    font-size: 19px;
+    line-height: 1.65;
+    margin: 24px 0;
+    font-family: Georgia, serif;
+  }
+  .takeaway b {
+    color: var(--paper);
+    font-variant: small-caps;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+  }
+
+  .callout {
+    background: var(--paper-deep);
+    border: 1px solid var(--ink);
+    border-left: 6px solid var(--cobalt);
+    border-radius: 0;
+    padding: 16px 20px;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 18px 0;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+
+  /* shared viz styles */
+  .viz {
+    background: var(--paper-deep);
+    border: 2px solid var(--ink);
+    border-radius: 0;
+    padding: 18px 20px;
+    margin: 18px 0;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .viz-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+  .viz-row.two { grid-template-columns: 1.3fr 1fr; }
+  @media (max-width: 900px) {
+    .viz-row, .viz-row.two { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 0;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel h4 {
+    margin: 0 0 10px;
+    font-family: 'Abril Fatface', Georgia, serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--cobalt);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+  }
+  .legend {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    flex-wrap: wrap;
+    font-family: Georgia, serif;
+    font-style: italic;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 0; display: inline-block; border: 1px solid var(--ink); }
+  button {
+    background: var(--cobalt);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 7px 16px;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'EB Garamond', serif;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform .08s, box-shadow .08s;
+  }
+  button:hover { background: var(--cobalt-bright); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+  button:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+  button.ghost { background: var(--paper); color: var(--ink); }
+  button.ghost:hover { background: var(--paper-deep); }
+
+  /* === LESSON 1: token viz === */
+  #tv-tokens { display: flex; gap: 6px; justify-content: center; margin: 18px 0 8px; flex-wrap: wrap; }
+  .tv-token {
+    padding: 10px 12px;
+    background: #1f242f;
+    border: 1px solid #2c323e;
+    border-radius: 6px;
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    min-width: 38px;
+    text-align: center;
+  }
+  .tv-token:hover { border-color: #4a5160; }
+  .tv-token.sees { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; }
+  .tv-token.selected {
+    background: #fbbf24; color: #0f1116; border-color: #fbbf24; transform: translateY(-3px);
+  }
+  .tv-token.cant-see { opacity: 0.3; }
+  .tv-token .idx { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: #6b7280; }
+  #tv-canvas {
+    background: #0c0e13; border-radius: 8px; padding: 16px; min-height: 200px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .tv-state-label { font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: #fbbf24; margin-bottom: 8px; }
+  .tv-state-knows { color: #9aa0aa; font-size: 12px; margin-bottom: 14px; text-align: center; font-style: italic; }
+  .tv-state-bar { display: flex; gap: 2px; width: 100%; max-width: 360px; height: 22px; }
+  .tv-state-bar div { flex: 1; border-radius: 2px; }
+  #tv-pca {
+    width: 100%; aspect-ratio: 1.6 / 1; background: #0c0e13; border-radius: 6px;
+    position: relative; margin-top: 8px;
+  }
+  #tv-pca .dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  #tv-pca .dot.true { background: #4ade80; }
+  #tv-pca .dot.false { background: #f87171; }
+  #tv-pca .axis { position: absolute; background: #2c323e; }
+  #tv-pca .axis-x { left: 10%; right: 10%; top: 50%; height: 1px; }
+  #tv-pca .axis-y { top: 10%; bottom: 10%; left: 50%; width: 1px; }
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; background: #2a2f3a; color: #c0c5d0; margin-left: 6px;
+  }
+  .pill.good { background: #14532d; color: #86efac; }
+  .pill.bad  { background: #5a1e1e; color: #fca5a5; }
+  .narration {
+    background: var(--paper-deep);
+    border: 1px solid var(--ink);
+    border-left: 5px solid var(--cobalt);
+    padding: 14px 16px; border-radius: 0;
+    font-size: 17px; line-height: 1.6; margin-top: 14px;
+    color: var(--ink);
+    font-family: Georgia, serif;
+  }
+  .narration b { color: var(--cobalt-deep); font-variant: small-caps; letter-spacing: 1px; }
+
+  /* === LESSON 2: swap viz === */
+  .sv-prompt {
+    font-family: 'SF Mono', Menlo, monospace; font-size: 11px; color: #c0c5d0;
+    margin-bottom: 10px; padding: 6px 8px; background: #0c0e13; border-radius: 4px;
+  }
+  .sv-prompt b { color: #fbbf24; }
+  .sv-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; flex: 1; min-height: 0; min-width: 0; width: 100%; }
+  .sv-cell {
+    aspect-ratio: 1; border-radius: 4px; background: #1f242f;
+    border: 1px solid #2c323e; cursor: pointer; transition: all 0.15s; position: relative;
+  }
+  .sv-cell.true-run { background: #14532d; border-color: #166534; }
+  .sv-cell.false-run { background: #5a1e1e; border-color: #7f1d1d; }
+  .sv-cell.selected {
+    outline: 2px solid #fbbf24; outline-offset: 1px; transform: scale(1.1); z-index: 2;
+  }
+  .sv-cell.patched {
+    background: #14532d !important; border-color: #fbbf24 !important;
+    animation: sv-glow 1s ease-in-out;
+  }
+  @keyframes sv-glow {
+    0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); }
+    100% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); }
+  }
+  .axis-label { font-size: 10px; color: #6b7280; text-align: center; margin-top: 4px; }
+  .y-axis { font-size: 10px; color: #6b7280; margin-bottom: 4px; }
+  .sv-output {
+    margin-top: 10px; padding: 8px 10px; background: #0c0e13;
+    border-radius: 6px; font-family: 'SF Mono', Menlo, monospace; font-size: 12px;
+  }
+  .sv-output .label { color: #6b7280; font-size: 10px; }
+  .verdict { font-size: 16px; font-weight: bold; margin-top: 2px; }
+  .verdict.true { color: #4ade80; }
+  .verdict.false { color: #f87171; }
+  .verdict.flipped { color: #fbbf24; }
+  .sv-heatmap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; flex: 1; min-height: 0; min-width: 0; width: 100%; align-content: start; }
+  .sv-hcell {
+    aspect-ratio: 1; border-radius: 4px; font-size: 12px;
+    background: #1f242f;
+    border: 1px solid #2c323e;
+    display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+  }
+  .sv-hcell:hover {
+    transform: scale(1.08);
+    border-color: var(--cobalt);
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--cobalt);
+    z-index: 2;
+  }
+
+  /* === LESSON 3: probes viz === */
+  canvas#pv-scatter { width: 100%; aspect-ratio: 1.1 / 1; background: #0c0e13; border-radius: 8px; display: block; }
+  canvas#pv-proj1d { width: 100%; height: 80px; background: #0c0e13; border-radius: 8px; display: block; margin-top: 8px; }
+  .proj-caption { font-size: 11px; color: #6b7280; margin-top: 4px; text-align: center; font-style: italic; }
+  .controls { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+  .ctrl-row { display: flex; align-items: center; gap: 12px; font-size: 16px; }
+  .ctrl-row label { color: var(--ink); flex: 1; font-family: Georgia, serif; }
+  .ctrl-row input[type=range] { flex: 1.5; accent-color: var(--cobalt); }
+  .ctrl-row .val { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: var(--cobalt-deep); font-weight: 700; min-width: 40px; text-align: right; }
+  .method {
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px;
+    border: 1.5px solid var(--ink); border-radius: 0; cursor: pointer;
+    background: var(--paper);
+    transition: all 0.15s; margin-bottom: 10px;
+  }
+  .method:hover { background: var(--paper-deep); }
+  .method.active { background: var(--cobalt); border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .method.active .name,
+  .method.active .desc,
+  .method.active .err { color: var(--paper); }
+  .method .dot {
+    width: 14px; height: 14px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+    border: 1.5px solid var(--ink);
+  }
+  .method .body { flex: 1; }
+  .method .name { font-weight: 700; font-size: 17px; color: var(--ink); font-family: Georgia, serif; }
+  .method .desc { color: var(--ink-soft); font-size: 14px; margin-top: 3px; font-family: Georgia, serif; }
+  .method .err { margin-top: 6px; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--cobalt-deep); font-weight: 700; }
+  .line-swatch { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+  .toggle-row {
+    display: flex; align-items: center; gap: 8px; font-size: 12px;
+    color: #c0c5d0; margin-top: 8px;
+  }
+  .toggle-row input { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <div class="tag">N.º 1 — An interactive curriculum</div>
+    <h1>The Geometry of Truth<em>— in Large Language Models —</em></h1>
+    <div class="masthead-rule">Marks &amp; Tegmark · MMXXIV</div>
+    <p>A hands-on walkthrough of the central ideas in Marks &amp; Tegmark (2024). You'll go from "what is the model even doing?" to reading the model's internal truth judgments off a single number — and you'll see exactly why this works.</p>
+    <p style="margin-top:14px; font-size:15px; font-style:italic;">Paper: <a href="https://arxiv.org/html/2310.06824v3" target="_blank" rel="noopener">The Geometry of Truth: Emergent Linear Structure in LLM Representations of True/False Datasets</a> · <a href="paper.pdf" target="_blank" rel="noopener">[PDF]</a></p>
+    <p style="margin-top:8px; font-size:14px;"><a href="../">← back to index</a></p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="inner">
+    <a href="#lesson1"><span class="num">1</span>Where truth lives</a>
+    <a href="#lesson2"><span class="num">2</span>Proving it with swaps</a>
+    <a href="#lesson3"><span class="num">3</span>Finding the truth direction</a>
+    <a href="#conclusion"><span class="num">★</span>Putting it together</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ========================================================== -->
+<!-- LESSON 1                                                   -->
+<!-- ========================================================== -->
+<section id="lesson1" class="lesson">
+  <h2>Lesson 1 — Where in the model does "truth" live?</h2>
+  <p class="lead">Before we can do anything clever, we need to know which slot inside the model stores its judgment of a sentence as true or false.</p>
+
+  <p>When an LLM reads a sentence, it doesn't store its understanding in a single place. Every <b>token</b> (word or punctuation) gets its own <b>hidden state</b> — a vector of thousands of numbers — at every layer of the network. That's a lot of vectors per sentence. Which one carries the model's "is this true?" judgment?</p>
+
+  <p>The key fact: transformers are <b>causal</b>. A token at position <i>i</i> can only attend to tokens at positions ≤ <i>i</i>. So if you grab the hidden state at "Paris" in the middle of a sentence, it has no idea what comes after. Only the <b>last token</b> has read the whole thing.</p>
+
+  <p>Click around the sentence below to see which positions can "see" which other tokens, and what each one's hidden state would look like as a truth detector.</p>
+
+  <div class="viz">
+    <div class="viz-row two">
+      <div class="panel">
+        <h4>The sentence — 👉🏽 click a token</h4>
+        <div id="tv-tokens"></div>
+        <div class="legend">
+          <span><span class="swatch" style="background:#fbbf24;"></span>selected</span>
+          <span><span class="swatch" style="background:#1e3a5f;"></span>visible (causal mask)</span>
+          <span><span class="swatch" style="background:#1f242f; opacity:0.3;"></span>can't see (future)</span>
+        </div>
+        <div id="tv-canvas" style="margin-top:12px;"></div>
+      </div>
+      <div class="panel">
+        <h4>What you'd see in PCA <span class="pill" id="tv-pill">—</span></h4>
+        <div id="tv-pca">
+          <div class="axis axis-x"></div>
+          <div class="axis axis-y"></div>
+          <div style="position:absolute; top:8px; right:10px; background:rgba(236,225,198,0.92); border:1px solid var(--ink); padding:4px 8px; font-size:12px; font-family:Georgia,serif; display:flex; gap:10px; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#4ade80; border:1px solid var(--ink); display:inline-block;"></span>True</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#f87171; border:1px solid var(--ink); display:inline-block;"></span>False</span>
+          </div>
+        </div>
+        <div class="proj-caption" id="tv-caption">Each dot = one sentence. Green = true, red = false. Whether they separate depends on which token you read.</div>
+        <div class="narration" id="tv-narration"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <b>Takeaway:</b> The model's "summary" of the whole sentence lives over the <b>end-of-sentence punctuation token</b>. The period has seen all previous tokens (causal mask) and carries no word-meaning of its own, so its hidden state is a clean place to read off truth. That's what the paper uses: <i>layer 15, period token</i> for LLaMA-2-13B.
+  </div>
+</section>
+
+<!-- ========================================================== -->
+<!-- LESSON 2                                                   -->
+<!-- ========================================================== -->
+<section id="lesson2" class="lesson">
+  <h2>Lesson 2 — Proving it: the activation patching experiment</h2>
+  <p class="lead">"The period summarizes truth" is a hypothesis. To prove it, the paper runs a clean experiment: surgically swap one hidden state from a true-sentence run into a false-sentence run, and watch what happens.</p>
+
+  <h3 class="subhead">The setup</h3>
+  <p>Two sentences that differ by one word:</p>
+  <ul>
+    <li><b>p<sub>T</sub></b>: "The city of <b>Toronto</b> is in Canada." → model says TRUE</li>
+    <li><b>p<sub>F</sub></b>: "The city of <b>Chicago</b> is in Canada." → model says FALSE</li>
+  </ul>
+
+  <p>The experiment:</p>
+  <ol>
+    <li>Run the model on <b>p<sub>T</sub></b> and cache every hidden state (every position, every layer).</li>
+    <li>Run the model on <b>p<sub>F</sub></b>. At one chosen (layer, position), <b>overwrite</b> the activation with the cached value from the TRUE run.</li>
+    <li>See if the model's prediction flips toward TRUE.</li>
+  </ol>
+
+  <p>If swapping a particular slot can flip the answer, that slot is causally responsible for the truth judgment. 👉🏽 Click cells in the FALSE grid to try the swap.</p>
+
+  <div class="viz">
+    <div style="display:flex; gap:10px; margin-bottom:12px;">
+      <button class="ghost" onclick="sv_reset()">Reset</button>
+      <button onclick="sv_autoSweep()">Auto-sweep all cells</button>
+    </div>
+
+    <div class="viz-row">
+      <div class="panel">
+        <h4 style="color:#4ade80;">TRUE run — donor</h4>
+        <div class="sv-prompt">"The city of <b>Toronto</b> is in Canada."</div>
+        <div class="y-axis">layer ↑ (deep)</div>
+        <div class="sv-grid" id="sv-trueGrid"></div>
+        <div class="axis-label">← early · late token →</div>
+        <div class="sv-output">
+          <div class="label">model output:</div>
+          <div class="verdict true">TRUE ✓</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4 style="color:#f87171;">FALSE run — recipient</h4>
+        <div class="sv-prompt">"The city of <b>Chicago</b> is in Canada."</div>
+        <div class="y-axis">layer ↑ (deep)</div>
+        <div class="sv-grid" id="sv-falseGrid"></div>
+        <div class="axis-label">← early · late token →</div>
+        <div class="sv-output">
+          <div class="label">model output:</div>
+          <div class="verdict false" id="sv-verdict">FALSE ✓</div>
+          <div class="label" style="margin-top:4px;" id="sv-scoreText">logP(TRUE) − logP(FALSE) = −3.2</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Causal map</h4>
+        <div class="sv-prompt">👉🏽 click any cell — brighter = bigger effect</div>
+        <div class="y-axis">layer ↑ (deep)</div>
+        <div class="sv-heatmap" id="sv-heatmap"></div>
+        <div class="axis-label">← early · late token →</div>
+        <div class="legend">
+          <span><span class="swatch" style="background:#14532d;"></span>truthy</span>
+          <span><span class="swatch" style="background:#5a1e1e;"></span>falsy</span>
+          <span><span class="swatch" style="background:#fbbf24;"></span>swapped</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="narration" id="sv-narration">
+      👉🏽 <b>Click a red cell</b> to swap that activation with the matching cell from the TRUE run. Watch the output verdict and the causal map below.
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <b>Takeaway:</b> The auto-sweep reveals that only a small cluster of cells — concentrated around the <b>final punctuation token in middle layers</b> — can flip the answer. That's where the model parks its truth judgment. Everywhere else, swapping does nothing. This is the empirical proof for Lesson 1's claim.
+  </div>
+</section>
+
+<!-- ========================================================== -->
+<!-- LESSON 3                                                   -->
+<!-- ========================================================== -->
+<section id="lesson3" class="lesson">
+  <h2>Lesson 3 — Finding the truth direction</h2>
+  <p class="lead">Now that we know <i>where</i> the model stores truth (a single hidden state vector per sentence), we can ask: what does the geometry of those vectors look like?</p>
+
+  <h3 class="subhead">What's a "truth direction"?</h3>
+  <p>Inside the model, every sentence becomes a vector — a point in a high-dimensional space (5120 numbers for LLaMA-2-13B). A <b>direction</b> in that space is just an arrow (a unit vector). You can project any point onto the arrow and get a single number: "how far along it does this sentence sit?"</p>
+
+  <p>A direction θ<sub>t</sub> is a <b>truth direction</b> if projecting sentences onto it lines up with their truth value — true statements pile up on one side of zero, false on the other, with a clean gap.</p>
+
+  <div class="callout">
+    <b>Why this is surprising:</b> the model wasn't trained to do this. Yet, internally, it apparently keeps a running tally of "is this claim true?" along a clean linear axis — and you can read it off with a single dot product. That's the "geometry of truth."
+  </div>
+
+  <h3 class="subhead">Three ways to find it</h3>
+  <p>Given a labeled dataset of true/false activations, three different methods can recover θ<sub>t</sub>:</p>
+
+  <ul>
+    <li><b>LR — Logistic Regression.</b> Fit a linear classifier. Maximum-margin separator. Sensitive to confounds — tilts away from the true direction when correlated features exist.</li>
+    <li><b>MM — Mass-Mean probing.</b> The paper's contribution. Just take μ<sub>+</sub> − μ<sub>−</sub>: the arrow from the center of the false cluster to the center of the true cluster. Optimization-free. Often more causally meaningful than LR.</li>
+    <li><b>CCS — Contrast-Consistent Search.</b> Unsupervised. Uses pairs of (statement, negation) and finds a direction along which pair members separate. No labels needed, but brittle.</li>
+  </ul>
+
+  <p>Below is a simulated 2D activation cloud. The yellow arrow is the ground-truth direction θ<sub>t</sub>. Adjust the sliders and see which method best recovers it.</p>
+
+  <div class="viz">
+    <div class="viz-row two">
+      <div class="panel">
+        <h4>Activation cloud (2D)</h4>
+        <canvas id="pv-scatter" width="600" height="540"></canvas>
+        <div class="toggle-row">
+          <input type="checkbox" id="pv-showProj" checked onchange="pv_render()">
+          <label for="pv-showProj">Show projections onto θ<sub>t</sub> (the dot products)</label>
+        </div>
+        <canvas id="pv-proj1d" width="600" height="80"></canvas>
+        <div class="proj-caption">1D readout: each point's dot product with θ<sub>t</sub>. Clean separation = θ<sub>t</sub> is a valid truth direction.</div>
+        <div class="legend">
+          <span><span class="swatch" style="background:#4ade80;"></span>true</span>
+          <span><span class="swatch" style="background:#f87171;"></span>false</span>
+          <span><span class="line-swatch" style="background:#fbbf24;"></span>θ<sub>t</sub> (truth)</span>
+          <span><span class="line-swatch" style="background:#3b82f6;"></span>LR</span>
+          <span><span class="line-swatch" style="background:#a855f7;"></span>MM</span>
+          <span><span class="line-swatch" style="background:#06b6d4;"></span>CCS</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Controls</h4>
+        <div class="controls">
+          <div class="ctrl-row">
+            <label>Confound strength</label>
+            <input id="pv-confound" type="range" min="0" max="3" step="0.05" value="1.5">
+            <span class="val" id="pv-confoundVal">1.5</span>
+          </div>
+          <div class="ctrl-row">
+            <label>Confound–truth angle</label>
+            <input id="pv-angle" type="range" min="0" max="89" step="1" value="35">
+            <span class="val" id="pv-angleVal">35°</span>
+          </div>
+          <div class="ctrl-row">
+            <label>Contrast pair strength</label>
+            <input id="pv-pair" type="range" min="0" max="1" step="0.05" value="0.7">
+            <span class="val" id="pv-pairVal">0.7</span>
+          </div>
+          <div class="ctrl-row">
+            <label>Noise</label>
+            <input id="pv-noise" type="range" min="0.05" max="1" step="0.05" value="0.35">
+            <span class="val" id="pv-noiseVal">0.35</span>
+          </div>
+          <button onclick="pv_regenerate()">Resample data</button>
+        </div>
+
+        <h4 style="margin-top:14px;">Methods (👉🏽 click to toggle)</h4>
+        <div id="pv-lrCard" class="method active" onclick="pv_toggle('lr')">
+          <div class="dot" style="background:#3b82f6;"></div>
+          <div class="body">
+            <div class="name">LR — Logistic Regression</div>
+            <div class="desc">Max-margin classifier. Tilts under confounds.</div>
+            <div class="err" id="pv-lrErr"></div>
+          </div>
+        </div>
+        <div id="pv-mmCard" class="method active" onclick="pv_toggle('mm')">
+          <div class="dot" style="background:#a855f7;"></div>
+          <div class="body">
+            <div class="name">MM — Mass-Mean</div>
+            <div class="desc">μ<sub>+</sub> − μ<sub>−</sub>. Arrow between class centers.</div>
+            <div class="err" id="pv-mmErr"></div>
+          </div>
+        </div>
+        <div id="pv-ccsCard" class="method active" onclick="pv_toggle('ccs')">
+          <div class="dot" style="background:#06b6d4;"></div>
+          <div class="body">
+            <div class="name">CCS — Contrast-Consistent Search</div>
+            <div class="desc">Unsupervised. Uses contrast pairs.</div>
+            <div class="err" id="pv-ccsErr"></div>
+          </div>
+        </div>
+
+        <div class="narration" id="pv-narration"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="subhead">Experiments to try</h3>
+  <ol>
+    <li><b>Set confound to 0.</b> All three methods overlap with θ<sub>t</sub>. The problem is trivial — no competing variance.</li>
+    <li><b>Crank confound to 2.5, angle 30°.</b> LR visibly tilts away from θ<sub>t</sub>; MM stays glued to it. This is Fig. 4 of the paper.</li>
+    <li><b>Drop contrast pair strength to 0.2.</b> Negation no longer cleanly flips truth; CCS latches onto the wrong direction.</li>
+  </ol>
+
+  <div class="takeaway">
+    <b>Takeaway:</b> All three methods are searching for the same thing — the arrow along which labels differ. They disagree when the cloud has extra structure that's correlated with (but not equal to) truth. <b>Mass-mean is the paper's recommendation</b>: it ignores the cloud's shape and just connects the class means, which gives a more causally meaningful direction in real LLMs.
+  </div>
+</section>
+
+<!-- ========================================================== -->
+<!-- CONCLUSION                                                 -->
+<!-- ========================================================== -->
+<section id="conclusion" class="lesson">
+  <h2>Putting it all together</h2>
+  <p>You now know the pipeline:</p>
+  <ol>
+    <li><b>Pick the right slot</b> — the hidden state over the end-of-sentence period, in a middle layer. That's the model's summary of the whole statement (Lesson 1).</li>
+    <li><b>Confirm it's causal</b> — activation patching shows that swapping this slot from a true-sentence run can flip a false-sentence prediction (Lesson 2).</li>
+    <li><b>Find the truth direction</b> — given a labeled dataset of these activations, methods like mass-mean recover a single arrow θ<sub>t</sub> in activation space along which true and false sentences separate (Lesson 3).</li>
+  </ol>
+
+  <p>What you can do once you have θ<sub>t</sub>:</p>
+  <ul>
+    <li><b>Detect</b> when the model "believes" a statement — just project and check the sign.</li>
+    <li><b>Steer</b> the model — add θ<sub>t</sub> to its activations during a forward pass and watch its outputs shift toward truthful behavior. This is the causal validation in §6.</li>
+  </ul>
+
+  <p>The fact that a single linear direction can be used to <i>control</i> the model is strong evidence that truth isn't tangled nonlinearly across the network — it's just an axis the model uses, and the geometry tools above let you find it.</p>
+
+  <div class="takeaway">
+    <b>Where to go next:</b> The paper also shows that the truth direction <i>generalizes</i> across topically different datasets (cities, comparisons, negations) — and that as models get bigger, the direction becomes more universal. That's the "Geometry of Truth" thesis: scale produces increasingly abstract, shared linear representations of concepts like truth.
+  </div>
+</section>
+
+</div>
+
+<!-- ========================================================== -->
+<!-- SCRIPTS                                                    -->
+<!-- ========================================================== -->
+<script>
+// =================================================================
+// LESSON 1 — TOKEN VIZ
+// =================================================================
+(function() {
+  const sentence = ['The', 'city', 'of', 'Paris', 'is', 'in', 'France', '.'];
+  const quality = {
+    0: { score: 0.05, why: 'only saw "The" — no info about the sentence yet',                 pattern: 'noisy' },
+    1: { score: 0.08, why: 'only saw "The city" — knows it\'s about a city, nothing more',    pattern: 'noisy' },
+    2: { score: 0.10, why: 'only saw "The city of" — still no subject',                       pattern: 'noisy' },
+    3: { score: 0.30, why: 'saw "The city of Paris" — knows the subject but not the claim',   pattern: 'word' },
+    4: { score: 0.35, why: 'has subject + "is" — claim is starting but not stated',           pattern: 'partial' },
+    5: { score: 0.40, why: 'has subject + "is in" — still no predicate object',               pattern: 'partial' },
+    6: { score: 0.55, why: 'has the full claim — BUT the state is dominated by "France" itself (clusters by ending word, not by truth — footnote 3)', pattern: 'word' },
+    7: { score: 0.95, why: 'has read everything AND the period carries no word-meaning of its own — clean summary slot. This is what the paper uses.', pattern: 'clean' },
+  };
+
+  function build() {
+    const c = document.getElementById('tv-tokens');
+    sentence.forEach((tok, i) => {
+      const el = document.createElement('div');
+      el.className = 'tv-token';
+      el.textContent = tok;
+      const idx = document.createElement('span');
+      idx.className = 'idx';
+      idx.textContent = i;
+      el.appendChild(idx);
+      el.onclick = () => select(i);
+      c.appendChild(el);
+    });
+  }
+
+  function select(i) {
+    document.querySelectorAll('.tv-token').forEach((el, j) => {
+      el.classList.remove('selected', 'sees', 'cant-see');
+      if (j === i) el.classList.add('selected');
+      else if (j < i) el.classList.add('sees');
+      else el.classList.add('cant-see');
+    });
+    renderState(i);
+    renderPCA(i);
+    renderNarration(i);
+  }
+
+  function renderState(i) {
+    const canvas = document.getElementById('tv-canvas');
+    const q = quality[i];
+    const sees = sentence.slice(0, i + 1).map(t => `"${t}"`).join(' ');
+    let bars = '';
+    for (let k = 0; k < 24; k++) {
+      const hue = q.pattern === 'clean' ? 200 + Math.random() * 30
+                : q.pattern === 'word'  ? 30 + Math.random() * 20
+                : q.pattern === 'partial' ? 280 + Math.random() * 20 : 0;
+      const v = 30 + Math.random() * 70;
+      bars += `<div style="background:hsl(${hue},65%,${v}%);"></div>`;
+    }
+    canvas.innerHTML = `
+      <div class="tv-state-label">h<sub>${i}</sub> · layer 15 hidden state</div>
+      <div class="tv-state-knows">has seen: ${sees}</div>
+      <div class="tv-state-bar">${bars}</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:10px; max-width:360px; text-align:center;">${q.why}</div>
+    `;
+  }
+
+  function renderPCA(i) {
+    const pca = document.getElementById('tv-pca');
+    pca.querySelectorAll('.dot').forEach(d => d.remove());
+    const q = quality[i];
+    function rand() { return (Math.random() + Math.random() + Math.random() - 1.5) * 0.5; }
+    for (let n = 0; n < 60; n++) {
+      const isTrue = n < 30;
+      let x, y;
+      if (q.pattern === 'clean') {
+        x = (isTrue ? 0.7 : 0.3) + rand() * 0.08;
+        y = 0.5 + rand() * 0.15;
+      } else if (q.pattern === 'word') {
+        const blob = Math.random() < 0.5;
+        x = (blob ? 0.3 : 0.7) + rand() * 0.08;
+        y = (blob ? 0.35 : 0.65) + rand() * 0.08;
+      } else if (q.pattern === 'partial') {
+        x = (isTrue ? 0.58 : 0.42) + rand() * 0.15;
+        y = 0.5 + rand() * 0.18;
+      } else {
+        x = 0.5 + rand() * 0.25;
+        y = 0.5 + rand() * 0.25;
+      }
+      const dot = document.createElement('div');
+      dot.className = `dot ${isTrue ? 'true' : 'false'}`;
+      dot.style.left = (x * 100) + '%';
+      dot.style.top = (y * 100) + '%';
+      pca.appendChild(dot);
+    }
+    const pill = document.getElementById('tv-pill');
+    const labels = { clean: ['clean separation', 'good'], word: ['clusters by word, not truth', 'bad'],
+                     partial: ['some separation', ''], noisy: ['no signal yet', 'bad'] };
+    const [text, cls] = labels[q.pattern];
+    pill.textContent = text;
+    pill.className = 'pill ' + cls;
+    document.getElementById('tv-caption').textContent =
+      q.pattern === 'clean'  ? 'True (green) and false (red) sentences separate along PC1. This is the truth direction.' :
+      q.pattern === 'word'   ? 'Dots cluster — but by which word the sentence ended on, not by truth.' :
+      q.pattern === 'partial'? 'Some separation, but messy — not enough of the sentence has been processed yet.' :
+                               'No structure — this position hasn\'t read enough of the sentence to know anything.';
+  }
+
+  function renderNarration(i) {
+    const n = document.getElementById('tv-narration');
+    const tok = sentence[i];
+    if (i === 7) {
+      n.innerHTML = `<b>This is the one.</b> The period has seen every previous token (causal mask), so its hidden state summarizes the whole sentence. And because "." carries no word-meaning, the state can be a clean truth readout. <b>This is what the paper grabs.</b>`;
+    } else if (i === 6) {
+      n.innerHTML = `<b>So close — but watch out.</b> "${tok}" has read the full claim, so it does carry truth info. But its hidden state is also dominated by the identity of the word "${tok}" itself. <i>Exactly what footnote 3 warns about.</i>`;
+    } else if (i >= 3) {
+      n.innerHTML = `<b>"${tok}" has seen part of the sentence but not all of it.</b> Its hidden state knows the subject but not the full claim, so it can't carry a true/false judgment yet.`;
+    } else {
+      n.innerHTML = `<b>"${tok}" has barely read anything.</b> This position only saw "${sentence.slice(0, i+1).join(' ')}" — no statement to judge yet.`;
+    }
+  }
+
+  build();
+  select(7);
+})();
+
+// =================================================================
+// LESSON 2 — SWAP VIZ
+// =================================================================
+const SV_ROWS = 5, SV_COLS = 6;
+const sv_importance = Array.from({length: SV_ROWS}, (_, r) =>
+  Array.from({length: SV_COLS}, (_, c) => {
+    const subjectCluster = Math.exp(-((r-2)**2 + (c-2)**2) / 2.5) * 0.7;
+    const eosCluster = Math.exp(-((r-2)**2 + (c-5)**2) / 1.8) * 1.0;
+    return Math.min(1, subjectCluster + eosCluster);
+  })
+);
+const sv_swappedScore = Array.from({length: SV_ROWS}, () => Array(SV_COLS).fill(null));
+
+function sv_build() {
+  const t = document.getElementById('sv-trueGrid');
+  const f = document.getElementById('sv-falseGrid');
+  const h = document.getElementById('sv-heatmap');
+  t.innerHTML = ''; f.innerHTML = ''; h.innerHTML = '';
+  for (let r = SV_ROWS - 1; r >= 0; r--) {
+    for (let c = 0; c < SV_COLS; c++) {
+      const tc = document.createElement('div');
+      tc.className = 'sv-cell true-run';
+      tc.dataset.r = r; tc.dataset.c = c;
+      t.appendChild(tc);
+      const fc = document.createElement('div');
+      fc.className = 'sv-cell false-run';
+      fc.dataset.r = r; fc.dataset.c = c;
+      fc.onclick = () => sv_doSwap(r, c);
+      f.appendChild(fc);
+      const hc = document.createElement('div');
+      hc.className = 'sv-hcell';
+      hc.dataset.r = r; hc.dataset.c = c;
+      hc.style.background = '#1f242f';
+      hc.style.cursor = 'pointer';
+      hc.onclick = () => sv_doSwap(r, c);
+      h.appendChild(hc);
+    }
+  }
+}
+
+function sv_doSwap(r, c) {
+  document.querySelectorAll('.sv-cell').forEach(el => el.classList.remove('selected', 'patched'));
+  const donor = document.querySelector(`#sv-trueGrid .sv-cell[data-r="${r}"][data-c="${c}"]`);
+  const recipient = document.querySelector(`#sv-falseGrid .sv-cell[data-r="${r}"][data-c="${c}"]`);
+  donor.classList.add('selected');
+  recipient.classList.add('patched');
+  const score = sv_importance[r][c];
+  sv_swappedScore[r][c] = score;
+  const newScore = -3.2 + score * 7;
+  document.getElementById('sv-scoreText').textContent =
+    `logP(TRUE) − logP(FALSE) = ${newScore.toFixed(2)}`;
+  const verdict = document.getElementById('sv-verdict');
+  const layer = r + 1, pos = c + 1;
+  const n = document.getElementById('sv-narration');
+  if (newScore > 0.5) {
+    verdict.className = 'verdict flipped';
+    verdict.textContent = 'TRUE ⚡ (flipped!)';
+    n.innerHTML = `<b>Big effect!</b> Swapping the state at <b>layer ${layer}, position ${pos}</b> made the model output TRUE — even though the sentence still says "Chicago is in Canada." That slot was carrying the truth judgment.`;
+  } else if (newScore > -1) {
+    verdict.className = 'verdict false';
+    verdict.textContent = 'FALSE (wavering...)';
+    n.innerHTML = `<b>Some effect.</b> Layer ${layer}, position ${pos} nudged the model toward TRUE but didn't fully flip it.`;
+  } else {
+    verdict.className = 'verdict false';
+    verdict.textContent = 'FALSE ✓ (unchanged)';
+    n.innerHTML = `<b>No effect.</b> Swapping layer ${layer}, position ${pos} did nothing — this slot wasn't about truth.`;
+  }
+  sv_updateHeatmap();
+}
+
+function sv_updateHeatmap() {
+  for (let r = 0; r < SV_ROWS; r++) {
+    for (let c = 0; c < SV_COLS; c++) {
+      const s = sv_swappedScore[r][c];
+      const cell = document.querySelector(`#sv-heatmap .sv-hcell[data-r="${r}"][data-c="${c}"]`);
+      if (s === null) { cell.style.background = '#1f242f'; cell.textContent = ''; }
+      else {
+        const intensity = Math.round(s * 255);
+        cell.style.background = `rgb(${intensity}, ${Math.round(intensity*0.7)}, 30)`;
+        cell.textContent = s.toFixed(1);
+      }
+    }
+  }
+}
+
+function sv_reset() {
+  for (let r = 0; r < SV_ROWS; r++) for (let c = 0; c < SV_COLS; c++) sv_swappedScore[r][c] = null;
+  document.querySelectorAll('.sv-cell').forEach(el => el.classList.remove('selected', 'patched'));
+  document.getElementById('sv-verdict').className = 'verdict false';
+  document.getElementById('sv-verdict').textContent = 'FALSE ✓';
+  document.getElementById('sv-scoreText').textContent = 'logP(TRUE) − logP(FALSE) = −3.2';
+  document.getElementById('sv-narration').innerHTML = `👉🏽 <b>Click a red cell</b> to swap it with the matching green one.`;
+  sv_updateHeatmap();
+}
+
+async function sv_autoSweep() {
+  sv_reset();
+  for (let r = 0; r < SV_ROWS; r++) {
+    for (let c = 0; c < SV_COLS; c++) {
+      sv_doSwap(r, c);
+      await new Promise(res => setTimeout(res, 100));
+    }
+  }
+  document.getElementById('sv-narration').innerHTML = `<b>Sweep complete.</b> The bright spots in the causal map show which (layer, position) pairs carry the truth signal — they're the only places where swapping moves the output.`;
+}
+
+sv_build();
+sv_updateHeatmap();
+
+// =================================================================
+// LESSON 3 — PROBES VIZ
+// =================================================================
+const pv_canvas = document.getElementById('pv-scatter');
+const pv_ctx = pv_canvas.getContext('2d');
+const PV_W = pv_canvas.width, PV_H = pv_canvas.height;
+const pv_show = { lr: true, mm: true, ccs: true };
+let pv_data = null;
+
+function pv_gen() {
+  const N = 80;
+  const confoundStr = +document.getElementById('pv-confound').value;
+  const angle = +document.getElementById('pv-angle').value * Math.PI / 180;
+  const pairStr = +document.getElementById('pv-pair').value;
+  const noise = +document.getElementById('pv-noise').value;
+  const points = [];
+  for (let i = 0; i < N; i++) {
+    const label = i < N/2 ? 1 : 0;
+    const truth = (label === 1 ? 1 : -1) * (0.8 + Math.random() * 0.4);
+    const fval = (Math.random() - 0.5) * 2 * confoundStr;
+    let x = truth + fval * Math.cos(angle);
+    let y = 0     + fval * Math.sin(angle);
+    x += (Math.random() - 0.5) * noise;
+    y += (Math.random() - 0.5) * noise;
+    points.push({ x, y, label });
+  }
+  const pairs = [];
+  for (let i = 0; i < N/2; i++) {
+    const a = points[i];
+    const fval = (Math.random() - 0.5) * 2 * confoundStr;
+    const truthFlip = -1 * (0.8 + Math.random() * 0.4) * pairStr + (1-pairStr) * (Math.random()-0.5) * 2;
+    let px = truthFlip + fval * Math.cos(angle);
+    let py = 0          + fval * Math.sin(angle);
+    px += (Math.random() - 0.5) * noise;
+    py += (Math.random() - 0.5) * noise;
+    const partner = { x: px, y: py, label: 0 };
+    points.push(partner);
+    pairs.push([a, partner]);
+  }
+  return { points, pairs };
+}
+
+function pv_lr(points) {
+  let w = [Math.random(), Math.random()];
+  for (let step = 0; step < 400; step++) {
+    let gx = 0, gy = 0;
+    for (const p of points) {
+      const z = w[0]*p.x + w[1]*p.y;
+      const s = 1 / (1 + Math.exp(-z));
+      const err = s - p.label;
+      gx += err * p.x; gy += err * p.y;
+    }
+    w[0] -= 0.05 * gx / points.length;
+    w[1] -= 0.05 * gy / points.length;
+  }
+  return pv_normalize(w);
+}
+function pv_mm(points) {
+  let pos = [0,0], neg = [0,0], np = 0, nn = 0;
+  for (const p of points) {
+    if (p.label === 1) { pos[0]+=p.x; pos[1]+=p.y; np++; }
+    else { neg[0]+=p.x; neg[1]+=p.y; nn++; }
+  }
+  return pv_normalize([pos[0]/np - neg[0]/nn, pos[1]/np - neg[1]/nn]);
+}
+function pv_ccs(pairs) {
+  let M = [[0,0],[0,0]];
+  for (const [a, b] of pairs) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    M[0][0] += dx*dx; M[0][1] += dx*dy;
+    M[1][0] += dy*dx; M[1][1] += dy*dy;
+  }
+  const a = M[0][0], b = M[0][1], c = M[1][0], d = M[1][1];
+  const tr = a + d, det = a*d - b*c;
+  const eig = tr/2 + Math.sqrt(tr*tr/4 - det);
+  let v;
+  if (Math.abs(b) > 1e-8) v = [eig - d, b];
+  else if (Math.abs(c) > 1e-8) v = [c, eig - a];
+  else v = a > d ? [1, 0] : [0, 1];
+  return pv_normalize(v);
+}
+function pv_normalize(v) {
+  const n = Math.hypot(v[0], v[1]);
+  return n < 1e-9 ? [1, 0] : [v[0]/n, v[1]/n];
+}
+function pv_angleBetween(a, b) {
+  let dot = a[0]*b[0] + a[1]*b[1];
+  dot = Math.max(-1, Math.min(1, Math.abs(dot)));
+  return Math.acos(dot) * 180 / Math.PI;
+}
+
+const pv_cx = PV_W/2, pv_cy = PV_H/2, pv_scale = 100;
+function pv_toScreen(x, y) { return [pv_cx + x * pv_scale, pv_cy - y * pv_scale]; }
+
+function pv_drawAxis() {
+  pv_ctx.fillStyle = '#0c0e13';
+  pv_ctx.fillRect(0, 0, PV_W, PV_H);
+  pv_ctx.strokeStyle = '#1f242f';
+  pv_ctx.lineWidth = 1;
+  pv_ctx.beginPath();
+  for (let i = -3; i <= 3; i++) {
+    const [x1, y1] = pv_toScreen(i, -3);
+    const [x2, y2] = pv_toScreen(i, 3);
+    pv_ctx.moveTo(x1, y1); pv_ctx.lineTo(x2, y2);
+    const [a1, b1] = pv_toScreen(-3, i);
+    const [a2, b2] = pv_toScreen(3, i);
+    pv_ctx.moveTo(a1, b1); pv_ctx.lineTo(a2, b2);
+  }
+  pv_ctx.stroke();
+}
+function pv_drawDirection(v, color, label, offset) {
+  const len = 2.5;
+  const [x1, y1] = pv_toScreen(-v[0]*len, -v[1]*len);
+  const [x2, y2] = pv_toScreen(v[0]*len, v[1]*len);
+  pv_ctx.strokeStyle = color;
+  pv_ctx.lineWidth = 2.5;
+  pv_ctx.beginPath();
+  pv_ctx.moveTo(x1, y1); pv_ctx.lineTo(x2, y2);
+  pv_ctx.stroke();
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  pv_ctx.beginPath();
+  pv_ctx.moveTo(x2, y2);
+  pv_ctx.lineTo(x2 - 8 * Math.cos(a - 0.4), y2 - 8 * Math.sin(a - 0.4));
+  pv_ctx.lineTo(x2 - 8 * Math.cos(a + 0.4), y2 - 8 * Math.sin(a + 0.4));
+  pv_ctx.closePath();
+  pv_ctx.fillStyle = color;
+  pv_ctx.fill();
+  pv_ctx.font = '12px ui-monospace, Menlo, monospace';
+  pv_ctx.fillText(label, x2 + 6, y2 - 4 + offset);
+}
+function pv_drawProjectionLines() {
+  pv_ctx.strokeStyle = 'rgba(251, 191, 36, 0.18)';
+  pv_ctx.lineWidth = 1;
+  for (const p of pv_data.points) {
+    const [sx, sy] = pv_toScreen(p.x, p.y);
+    const [fx, fy] = pv_toScreen(p.x, 0);
+    pv_ctx.beginPath();
+    pv_ctx.moveTo(sx, sy); pv_ctx.lineTo(fx, fy);
+    pv_ctx.stroke();
+  }
+}
+function pv_drawPoints(points) {
+  for (const p of points) {
+    const [sx, sy] = pv_toScreen(p.x, p.y);
+    pv_ctx.fillStyle = p.label === 1 ? '#4ade80' : '#f87171';
+    pv_ctx.globalAlpha = 0.75;
+    pv_ctx.beginPath();
+    pv_ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+    pv_ctx.fill();
+  }
+  pv_ctx.globalAlpha = 1;
+}
+function pv_drawProjections() {
+  const showProj = document.getElementById('pv-showProj').checked;
+  const pc = document.getElementById('pv-proj1d');
+  const pctx = pc.getContext('2d');
+  pctx.fillStyle = '#0c0e13';
+  pctx.fillRect(0, 0, pc.width, pc.height);
+  if (!showProj) {
+    pctx.fillStyle = '#6b7280';
+    pctx.font = '12px ui-monospace, Menlo, monospace';
+    pctx.fillText('(projections hidden)', 12, pc.height / 2 + 4);
+    return;
+  }
+  const cy1d = pc.height / 2;
+  pctx.strokeStyle = '#262b36';
+  pctx.lineWidth = 1;
+  pctx.beginPath();
+  pctx.moveTo(20, cy1d); pctx.lineTo(pc.width - 20, cy1d);
+  pctx.stroke();
+  pctx.beginPath();
+  pctx.moveTo(pc.width / 2, cy1d - 8); pctx.lineTo(pc.width / 2, cy1d + 8);
+  pctx.strokeStyle = '#fbbf24';
+  pctx.stroke();
+  pctx.fillStyle = '#fbbf24';
+  pctx.font = '10px ui-monospace, Menlo, monospace';
+  pctx.fillText('0', pc.width / 2 - 3, cy1d + 22);
+  pctx.fillStyle = '#9aa0aa';
+  pctx.fillText('← false side', 24, cy1d - 14);
+  pctx.fillText('true side →', pc.width - 92, cy1d - 14);
+  for (const p of pv_data.points) {
+    const px = pc.width / 2 + p.x * 80;
+    const py = cy1d + (Math.random() - 0.5) * 18;
+    pctx.fillStyle = p.label === 1 ? '#4ade80' : '#f87171';
+    pctx.globalAlpha = 0.7;
+    pctx.beginPath();
+    pctx.arc(px, py, 3.5, 0, Math.PI * 2);
+    pctx.fill();
+  }
+  pctx.globalAlpha = 1;
+}
+
+function pv_render() {
+  pv_drawAxis();
+  const showProj = document.getElementById('pv-showProj').checked;
+  if (showProj) pv_drawProjectionLines();
+  pv_drawPoints(pv_data.points);
+  pv_drawDirection([1, 0], '#fbbf24', 'θ_t (truth)', 0);
+  const truth = [1, 0];
+  const results = {};
+  if (pv_show.lr)  { results.lr  = pv_lr(pv_data.points);  pv_drawDirection(results.lr,  '#3b82f6', 'LR',  14); }
+  if (pv_show.mm)  { results.mm  = pv_mm(pv_data.points);  pv_drawDirection(results.mm,  '#a855f7', 'MM',  28); }
+  if (pv_show.ccs) { results.ccs = pv_ccs(pv_data.pairs);  pv_drawDirection(results.ccs, '#06b6d4', 'CCS', 42); }
+  document.getElementById('pv-lrErr').textContent  = results.lr  ? `off by ${pv_angleBetween(results.lr,  truth).toFixed(1)}°` : '';
+  document.getElementById('pv-mmErr').textContent  = results.mm  ? `off by ${pv_angleBetween(results.mm,  truth).toFixed(1)}°` : '';
+  document.getElementById('pv-ccsErr').textContent = results.ccs ? `off by ${pv_angleBetween(results.ccs, truth).toFixed(1)}°` : '';
+  const errs = [];
+  if (results.lr) errs.push(['LR', pv_angleBetween(results.lr, truth)]);
+  if (results.mm) errs.push(['MM', pv_angleBetween(results.mm, truth)]);
+  if (results.ccs) errs.push(['CCS', pv_angleBetween(results.ccs, truth)]);
+  if (errs.length) {
+    errs.sort((a,b) => a[1] - b[1]);
+    const winner = errs[0][0];
+    const confound = +document.getElementById('pv-confound').value;
+    const pair = +document.getElementById('pv-pair').value;
+    let msg = `<b>Best estimate of θ_t: ${winner}</b> (off by ${errs[0][1].toFixed(1)}°). `;
+    if (confound > 1.5 && winner === 'MM') {
+      msg += `With a strong confound, MM stays pointed at the true direction while LR tilts to maximize margin.`;
+    } else if (confound < 0.4) {
+      msg += `With little confound, all three methods agree — easy problem.`;
+    } else if (pair < 0.4 && results.ccs && pv_angleBetween(results.ccs, truth) > 30) {
+      msg += `CCS struggles when contrast pairs don't cleanly flip truth.`;
+    } else {
+      msg += `Try cranking confound up — that's when methods diverge most.`;
+    }
+    document.getElementById('pv-narration').innerHTML = msg;
+  }
+  pv_drawProjections();
+}
+function pv_regenerate() { pv_data = pv_gen(); pv_render(); }
+function pv_toggle(k) {
+  pv_show[k] = !pv_show[k];
+  document.getElementById('pv-' + k + 'Card').classList.toggle('active', pv_show[k]);
+  pv_render();
+}
+['pv-confound', 'pv-angle', 'pv-pair', 'pv-noise'].forEach(id => {
+  document.getElementById(id).addEventListener('input', e => {
+    document.getElementById(id + 'Val').textContent =
+      id === 'pv-angle' ? e.target.value + '°' : e.target.value;
+    pv_regenerate();
+  });
+});
+pv_regenerate();
+</script>
+
+</body>
+</html>
