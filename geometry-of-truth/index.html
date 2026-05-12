@@ -565,8 +565,12 @@
 <!-- OVERVIEW FLOWCHART                                         -->
 <!-- ========================================================== -->
 <section class="lesson" id="overview">
-  <h2>The big picture — from words to a PCA plot</h2>
-  <p class="lead">A map of the journey. Each lesson zooms into one of these boxes.</p>
+  <h2>What this paper is about</h2>
+  <p class="lead">A large language model (LLaMA-2-13B) was never explicitly taught what is true or false. Yet Marks &amp; Tegmark show that, inside the model, true and false statements are separated by a single straight line in activation space — and you can find it.</p>
+
+  <p>The paper does this in three moves: (1) pinpoint the slot inside the model that carries the truth judgment, (2) confirm it's the one that <i>causally</i> drives the output, and (3) recover the "truth direction" along which true and false statements split. The three lessons below mirror those three moves.</p>
+
+  <p>To get there, the paper relies on a small pipeline that turns each sentence into a single vector and then asks where that vector lives. Here's the whole pipeline at a glance — each step is what one of the lessons (or the underlying probe methods) will zoom into:</p>
 
   <div class="flowchart">
     <div class="fc-step" data-step="1">
