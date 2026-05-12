@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Activation Patching (Toy Visualization)</title>
+<style>
+  :root {
+    --cell: 32px;
+    --gap: 4px;
+    --true: #2d7ef7;
+    --false: #e8524a;
+    --patched: #2db980;
+    --bg: #0f172a;
+    --ink: #e5e7eb;
+    --muted: #94a3b8;
+    --gridbg: #111827;
+    --cellbg: #1f2937;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    margin: 24px;
+    line-height: 1.45;
+  }
+  h3 { margin: 12px 0 8px; font-weight: 650; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .panel {
+    background: #0b1220;
+    border: 1px solid #23324d;
+    border-radius: 10px;
+    padding: 14px;
+    flex: 1 1 420px;
+    min-width: 360px;
+  }
+  .legend { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .tokens { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .token {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #0e1526;
+    border: 1px solid #1c2842;
+    font-size: 12px;
+  }
+  .gridwrap { overflow-x: auto; padding-bottom: 4px; }
+  .grid {
+    display: grid;
+    gap: var(--gap);
+    background: var(--gridbg);
+    padding: var(--gap);
+    border-radius: 10px;
+    border: 1px solid #1f2a44;
+  }
+  .cell {
+    width: var(--cell);
+    height: var(--cell);
+    background: var(--cellbg);
+    border: 1px solid #273449;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .06s ease, background .2s ease, border-color .2s ease;
+  }
+  .cell:hover { transform: translateY(-1px); border-color: #3a4d6f; }
+  .tlabel { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .barwrap {
+    background: #0e1526;
+    border: 1px solid #1c2842;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .meter {
+    position: relative;
+    height: 14px;
+    background: linear-gradient(90deg, var(--false), #6b7280, var(--true));
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0 2px;
+  }
+  .needle {
+    position: absolute; top: -3px;
+    width: 4px; height: 20px;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #0005;
+    left: 25%;
+    transition: left .25s ease;
+  }
+  .scale {
+    display: flex; justify-content: space-between; font-size: 12px; color: var(--muted);
+  }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  button {
+    background: #1a2a4a;
+    color: #e8eefc;
+    border: 1px solid #2c3f67;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { background: #20345b; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid #0005; }
+  .true { background: var(--true); }
+  .false { background: var(--false); }
+  .patched { background: var(--patched); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #102039;
+    border: 1px solid #243a63;
+    color: #9cc2ff;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="row">
+  <div class="panel">
+    <div class="tlabel">True run prompt tokens</div>
+    <div class="tokens" id="trueTokens"></div>
+    <div class="legend">
+      Grid: rows = layers, columns = token positions. Click on the False grid to “patch” a cell with its True counterpart.
+    </div>
+    <div class="gridwrap">
+      <div id="trueGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tlabel">False run prompt tokens</div>
+    <div class="tokens" id="falseTokens"></div>
+    <div class="legend">
+      Click a cell to copy the True activation ($h_{i,\ell}$) here. Cells with bigger influence push the meter toward TRUE.
+    </div>
+    <div class="gridwrap">
+      <div id="falseGrid" class="grid"></div>
+    </div>
+
+    <div class="barwrap">
+      <div class="pill">
+        <span class="dot false"></span> FALSE
+        <span class="badge">preference meter</span>
+        <span class="dot true"></span> TRUE
+      </div>
+      <div class="meter"><div class="needle" id="needle"></div></div>
+      <div class="scale">
+        <span id="scoreTxt">Δ logit(T−F): −1.50 (baseline)</span>
+        <span id="patchedTxt">patched cells: 0</span>
+      </div>
+
+      <div class="btns">
+        <button id="patchEOS">Patch end-of-sentence cluster</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div class="hint">
+        This is a toy visualization. In the paper, the effect size is the change in log‑prob(TRUE) − log‑prob(FALSE) after swapping one $h_{i,\ell}$. Patching near the final punctuation is often most causal.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Toy data (tokens) ----
+  const trueTokens = ["The","city","of","Toronto","is","in","Canada",".","This","statement","is",":"];
+  const falseTokens = ["The","city","of","Chicago","is","in","Canada",".","This","statement","is",":"];
+
+  const LAYERS = 8;                 // keep it small for a demo
+  const TOKENS = falseTokens.length;
+  const EOS_INDEX = 7;              // index of final punctuation
+
+  // ---- Influence weights (toy): larger near end-of-sentence and mid/late layers ----
+  // weights[l][i] -> contribution when patching (i, l)
+  const weights = Array.from({length: LAYERS}, (_, l) =>
+    Array.from({length: TOKENS}, (_, i) => {
+      let w = 0.02; // small base effect
+      // entity tokens provide some effect
+      if (i === 3 || i === 6) w += 0.06 + 0.01 * l;
+      // "summary" over final punctuation grows in mid-to-late layers
+      if (i === EOS_INDEX && l >= 3 && l <= 6) w += 0.22 + 0.05 * (l-3);
+      return Number(w.toFixed(3));
+    })
+  );
+
+  // ---- State ----
+  let patched = new Set(); // key "l-i"
+  let score = -1.5;        // start preferring FALSE (toy baseline)
+
+  // ---- Build tokens row ----
+  function renderTokens(el, toks) {
+    el.innerHTML = "";
+    toks.forEach((t, i) => {
+      const span = document.createElement("span");
+      span.className = "token";
+      span.textContent = `${i}:${t}`;
+      el.appendChild(span);
+    });
+  }
+
+  // ---- Build grids ----
+  function gridTemplate() {
+    return `repeat(${TOKENS}, var(--cell)) / repeat(${TOKENS}, var(--cell))`;
+  }
+  function buildGrid(el, kind) {
+    el.style.gridTemplateColumns = `repeat(${TOKENS}, var(--cell))`;
+    el.style.gridTemplateRows = `repeat(${LAYERS}, var(--cell))`;
+    el.innerHTML = "";
+    for (let l = 0; l < LAYERS; l++) {
+      for (let i = 0; i < TOKENS; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.i = i;
+        cell.dataset.l = l;
+        cell.title = `Layer ${l}, Token ${i}`;
+        // visual hints on True grid (blue) vs False grid (red)
+        cell.style.outline = kind === "true" ? "1px solid #2d7ef733" : "1px solid #e8524a33";
+        if (kind === "false") {
+          cell.addEventListener("click", () => patchCell(i, l, cell));
+        }
+        el.appendChild(cell);
+      }
+    }
+  }
+
+  // ---- Patch action ----
+  function patchCell(i, l, cellEl) {
+    const key = `${l}-${i}`;
+    if (patched.has(key)) {
+      // unpatch
+      patched.delete(key);
+      score -= weights[l][i];
+      cellEl.style.background = "var(--cellbg)";
+      cellEl.style.borderColor = "#273449";
+    } else {
+      // patch
+      patched.add(key);
+      score += weights[l][i];
+      cellEl.style.background = "linear-gradient(145deg,#153a2f,#0f2b24)";
+      cellEl.style.borderColor = "#39c494";
+    }
+    updateMeter();
+  }
+
+  // ---- Update meter ----
+  function updateMeter() {
+    // map score from [-2.0, +2.0] -> [0%, 100%]
+    const clamped = Math.max(-2, Math.min(2, score));
+    const pct = ((clamped + 2) / 4) * 100;
+    document.getElementById("needle").style.left = `calc(${pct}% - 2px)`;
+    document.getElementById("scoreTxt").textContent =
+      `Δ logit(T−F): ${score.toFixed(2)} (toy)`;
+    document.getElementById("patchedTxt").textContent =
+      `patched cells: ${patched.size}`;
+  }
+
+  // ---- Buttons ----
+  document.getElementById("patchEOS").addEventListener("click", () => {
+    // Patch a small end-of-sentence cluster across mid/late layers
+    const grid = document.getElementById("falseGrid");
+    for (let l of [3,4,5,6]) {
+      const idx = l*TOKENS + EOS_INDEX; // cell index in grid children
+      const cell = grid.children[idx];
+      patchCell(EOS_INDEX, l, cell);
+    }
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    const grid = document.getElementById("falseGrid");
+    for (let el of grid.children) {
+      el.style.background = "var(--cellbg)";
+      el.style.borderColor = "#273449";
+    }
+    patched.clear();
+    score = -1.5;
+    updateMeter();
+  });
+
+  // ---- Init ----
+  renderTokens(document.getElementById("trueTokens"), trueTokens);
+  renderTokens(document.getElementById("falseTokens"), falseTokens);
+  buildGrid(document.getElementById("trueGrid"), "true");
+  buildGrid(document.getElementById("falseGrid"), "false");
+  updateMeter();
+</script>
+</body>
+</html>
