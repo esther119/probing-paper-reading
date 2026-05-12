@@ -370,10 +370,20 @@
   .verdict.true { color: #4ade80; }
   .verdict.false { color: #f87171; }
   .verdict.flipped { color: #fbbf24; }
-  .sv-heatmap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; flex: 1; min-height: 0; min-width: 0; width: 100%; }
+  .sv-heatmap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; min-width: 0; width: 100%; }
   .sv-hcell {
-    aspect-ratio: 1; border-radius: 3px; font-size: 9px;
-    display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5);
+    aspect-ratio: 1; border-radius: 4px; font-size: 12px;
+    background: #1f242f;
+    border: 1px solid #2c323e;
+    display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+  }
+  .sv-hcell:hover {
+    transform: scale(1.08);
+    border-color: var(--cobalt);
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--cobalt);
+    z-index: 2;
   }
 
   /* === LESSON 3: probes viz === */
@@ -465,6 +475,10 @@
         <div id="tv-pca">
           <div class="axis axis-x"></div>
           <div class="axis axis-y"></div>
+          <div style="position:absolute; top:8px; right:10px; background:rgba(236,225,198,0.92); border:1px solid var(--ink); padding:4px 8px; font-size:12px; font-family:Georgia,serif; display:flex; gap:10px; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#4ade80; border:1px solid var(--ink); display:inline-block;"></span>True</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#f87171; border:1px solid var(--ink); display:inline-block;"></span>False</span>
+          </div>
         </div>
         <div class="proj-caption" id="tv-caption">Each dot = one sentence. Green = true, red = false. Whether they separate depends on which token you read.</div>
         <div class="narration" id="tv-narration"></div>
@@ -534,7 +548,7 @@
 
       <div class="panel">
         <h4>Causal map</h4>
-        <div style="font-size:11px; color:#9aa0aa; margin-bottom:6px;">Brighter = swap moved the output more. This is Fig. 2 of the paper.</div>
+        <div style="font-size:14px; color:var(--ink-soft); margin-bottom:8px; font-style:italic;">Click any cell to swap. Brighter = swap moved the output more. This is Fig. 2 of the paper.</div>
         <div class="y-axis">layer ↑ (deep)</div>
         <div class="sv-heatmap" id="sv-heatmap"></div>
         <div class="axis-label">← early · late token →</div>
@@ -859,6 +873,8 @@ function sv_build() {
       hc.className = 'sv-hcell';
       hc.dataset.r = r; hc.dataset.c = c;
       hc.style.background = '#1f242f';
+      hc.style.cursor = 'pointer';
+      hc.onclick = () => sv_doSwap(r, c);
       h.appendChild(hc);
     }
   }
