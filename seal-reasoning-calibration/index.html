@@ -216,7 +216,7 @@
   .step .ic { font-size: 22px; line-height: 1; }
   .step small { color: var(--ink-soft); font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
   .step.s { background: #efe7fb; border-color: #7c3aed; font-weight: 700; }
-  .step.glow { box-shadow: 5px 5px 0 var(--gold); transform: translate(-2px,-2px); border-color: var(--cobalt); }
+  .step.glow { box-shadow: 0 0 0 3px var(--gold), 5px 5px 0 var(--ink); transform: translate(-2px,-2px); border-color: var(--cobalt); background: #fffbe9; }
   .arr { display: flex; align-items: center; color: var(--cobalt); font-size: 22px; padding: 0 2px; font-family: 'Abril Fatface', serif; }
   .bridge { text-align: center; color: #7c3aed; font-weight: 700; font-size: 16px; margin: 8px 0; font-family: Georgia, serif; }
   .bridge .big { font-size: 30px; display: block; font-family: 'Abril Fatface', serif; }
@@ -501,11 +501,12 @@
 
   <div class="viz">
     <div class="controls" style="margin-top:0;">
-      <button id="ph-play">▶ Walk through</button>
+      <button id="ph-play">▶ Play guided tour</button>
       <button id="ph-reset" class="ghost">Reset</button>
       <span class="stepcount" id="ph-count"></span>
     </div>
-    <div class="cap" id="ph-cap" style="min-height:40px;"></div>
+    <p style="font-size:14px;font-style:italic;color:var(--ink-soft);margin:8px 0 0;">Optional: lights up each box below in order and explains it — watch S get built (offline), then applied (decode). Or just read the two lanes yourself.</p>
+    <div class="cap narration" id="ph-cap" style="min-height:40px;"></div>
 
     <div class="lane off">
       <div class="lanehd"><span class="off">① OFFLINE</span><span class="when">run once · no steering</span></div>
@@ -792,7 +793,7 @@
   function run(){stop();i=0;showStep(i);play.textContent='⏸ Playing…';timer=setInterval(()=>{i++;if(i>=steps.length){stop();return;}showStep(i);},1900);}
   play.onclick=()=>{if(timer){stop();}else{run();}};
   reset.onclick=()=>{stop();clear();cap.innerHTML='';count.textContent='';};
-  cap.innerHTML='<i>Press “Walk through” to see the two phases in sequence — or read them as the two lanes below.</i>';
+  cap.innerHTML='<i>The narration for each step will appear here once you press “Play guided tour.”</i>';
 })();
 
 /* ============ LESSON 5 — steering-type ablation ============ */
