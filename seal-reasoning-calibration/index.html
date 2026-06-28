@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEAL — Steerable Reasoning Calibration · interactive curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Abril+Fatface&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* === letterpress / Art Nouveau theme — matches the reading room === */
+  :root {
+    --paper: #ece1c6;
+    --paper-deep: #e2d3b0;
+    --ink: #14110d;
+    --ink-soft: #3a342a;
+    --cobalt: #1a3a8a;
+    --cobalt-deep: #122766;
+    --cobalt-bright: #2447b3;
+    --rule: #14110d;
+    /* viz accents (used on dark canvases) */
+    --exec: #4ade80;
+    --refl: #e0852e;
+    --trans: #a78bfa;
+    --gold: #fbbf24;
+    --dark: #0c0e13;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: Georgia, 'Iowan Old Style', 'Palatino', 'EB Garamond', serif;
+    background: var(--paper);
+    background-image: radial-gradient(rgba(20,17,13,0.04) 1px, transparent 1px);
+    background-size: 5px 5px;
+    color: var(--ink);
+    margin: 0; line-height: 1.7; font-size: 20px;
+  }
+  a { color: var(--cobalt); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 28px 80px; }
+
+  header.hero {
+    border-top: 6px double var(--ink); border-bottom: 6px double var(--ink);
+    padding: 28px 28px 22px; background: var(--paper); text-align: center; margin: 14px 14px 0;
+  }
+  header.hero .inner { max-width: 1100px; margin: 0 auto; }
+  header.hero .tag {
+    font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-soft);
+    font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.hero h1 {
+    margin: 0 0 14px; font-family: 'Abril Fatface', 'Cormorant Garamond', serif; font-weight: 400;
+    font-size: 70px; line-height: 0.95; letter-spacing: -1px; color: var(--cobalt);
+    text-shadow: 1px 1px 0 rgba(20,17,13,0.08);
+  }
+  header.hero h1 em {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; color: var(--ink);
+    font-size: 0.48em; display: block; margin-top: 8px; letter-spacing: 1px;
+  }
+  header.hero p { color: var(--ink); font-size: 20px; line-height: 1.65; max-width: 800px; margin: 0 auto; font-family: Georgia, serif; }
+  header.hero .masthead-rule {
+    display: flex; justify-content: center; align-items: center; gap: 18px; margin: 14px 0 12px;
+    font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-soft);
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  }
+  header.hero .masthead-rule::before, header.hero .masthead-rule::after { content: ""; height: 1px; background: var(--ink); flex: 1; max-width: 140px; }
+
+  nav.toc {
+    position: sticky; top: 0; z-index: 10; background: var(--paper-deep);
+    border-bottom: 3px double var(--ink); border-top: 1px solid var(--ink); padding: 8px 28px; margin: 0 14px;
+  }
+  nav.toc .inner {
+    max-width: 1200px; margin: 0 auto; display: flex; gap: 22px; flex-wrap: wrap; font-size: 16px;
+    justify-content: center; font-family: Georgia, serif; font-variant: small-caps; letter-spacing: 1px;
+  }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { color: var(--cobalt); border-bottom-color: var(--cobalt); }
+  nav.toc .num {
+    display: inline-block; background: var(--cobalt); color: var(--paper); width: 20px; height: 20px;
+    line-height: 20px; text-align: center; font-size: 12px; font-family: 'Abril Fatface', serif; margin-right: 6px;
+  }
+
+  section.lesson { margin-top: 56px; scroll-margin-top: 70px; padding: 0 14px; }
+  section.lesson h2 {
+    font-family: 'Abril Fatface', Georgia, serif; font-weight: 400; font-size: 42px; margin: 0 0 10px;
+    color: var(--cobalt); letter-spacing: -0.5px; border-bottom: 3px double var(--ink); padding-bottom: 12px; line-height: 1.15;
+  }
+  section.lesson .lead { color: var(--ink); font-size: 21px; font-style: italic; margin-bottom: 22px; font-family: Georgia, serif; line-height: 1.55; }
+  section.lesson p { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson p b { color: var(--cobalt-deep); font-weight: 700; }
+  section.lesson h3.subhead {
+    margin: 30px 0 12px; font-family: 'Abril Fatface', Georgia, serif; font-weight: 400; font-size: 26px;
+    color: var(--ink); letter-spacing: 0.5px;
+  }
+  section.lesson ul, section.lesson ol { color: var(--ink); font-size: 19px; line-height: 1.7; }
+  section.lesson li { margin-bottom: 10px; }
+
+  .eqbig {
+    background: var(--paper-deep); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink);
+    padding: 24px; text-align: center; font-family: 'SF Mono', Menlo, monospace; font-size: 34px;
+    letter-spacing: 1px; margin: 22px 0;
+  }
+  .eqbig .hp { color: var(--cobalt); font-weight: 700; }
+  .eqbig .a  { color: #b8860b; font-weight: 700; }
+  .eqbig .s  { color: #7c3aed; font-weight: 700; }
+  .eqmid {
+    background: var(--paper-deep); border: 1.5px solid var(--ink); padding: 14px; text-align:center;
+    font-family: 'SF Mono', Menlo, monospace; font-size: 20px; margin: 16px 0;
+  }
+  .eqmid .e { color: #1a7f37; font-weight:700; } .eqmid .r { color:#b8860b; font-weight:700; } .eqmid .s { color:#7c3aed; font-weight:700; }
+
+  .takeaway {
+    background: var(--cobalt); color: var(--paper); border-top: 4px solid var(--ink); border-bottom: 4px solid var(--ink);
+    padding: 18px 22px; font-size: 19px; line-height: 1.65; margin: 24px 0; font-family: Georgia, serif;
+  }
+  .takeaway b { color: var(--paper); font-variant: small-caps; letter-spacing: 1.5px; font-weight: 700; }
+  .callout {
+    background: var(--paper-deep); border: 1px solid var(--ink); border-left: 6px solid var(--cobalt);
+    padding: 16px 20px; font-size: 18px; line-height: 1.65; color: var(--ink); margin: 18px 0; font-style: italic; font-family: Georgia, serif;
+  }
+  .callout b { font-style: normal; color: var(--cobalt-deep); }
+
+  /* flowchart / numbered step panels */
+  .flowchart { margin: 22px 0; display: flex; flex-direction: column; gap: 0; }
+  .fc-step { background: var(--paper); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); padding: 20px 24px 22px 80px; position: relative; margin-bottom: 0; }
+  .fc-step::before {
+    content: attr(data-step); position: absolute; left: -2px; top: -2px; width: 60px; background: var(--cobalt);
+    color: var(--paper); border: 2px solid var(--ink); font-family: 'Abril Fatface', Georgia, serif;
+    font-size: 30px; text-align: center; line-height: 60px; height: 60px;
+  }
+  .fc-title { font-family: 'Abril Fatface', Georgia, serif; font-weight: 400; font-size: 23px; color: var(--cobalt-deep); margin: 0 0 12px; line-height: 1.2; }
+  .fc-body { font-size: 18px; line-height: 1.6; color: var(--ink); }
+  .fc-body small { color: var(--ink-soft); font-style: italic; }
+  .fc-mono { font-family: 'SF Mono', Menlo, monospace; font-size: 15px; color: var(--cobalt-deep); background: var(--paper-deep); border: 1px solid var(--ink); padding: 4px 9px; display: inline-block; }
+  .fc-arrow { text-align: center; font-family: 'Abril Fatface', Georgia, serif; font-size: 32px; color: var(--cobalt); margin: 10px 0; line-height: 1; }
+  code { font-family: 'SF Mono', Menlo, monospace; font-size: 0.82em; background: var(--paper-deep); border: 1px solid var(--ink); padding: 0 5px; }
+
+  /* viz shells */
+  .viz { background: var(--paper-deep); border: 2px solid var(--ink); padding: 18px 20px; margin: 18px 0; box-shadow: 4px 4px 0 var(--ink); }
+  .panel { background: var(--paper); border: 1.5px solid var(--ink); padding: 14px 16px; }
+  .panel h4 { margin: 0 0 10px; font-family: 'Abril Fatface', Georgia, serif; font-weight: 400; font-size: 20px; color: var(--cobalt); letter-spacing: 0.5px; border-bottom: 1px solid var(--ink); padding-bottom: 6px; }
+  .vizdark { background: var(--dark); border: 1.5px solid var(--ink); padding: 14px; margin-top: 10px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; color: var(--ink-soft); margin-top: 12px; flex-wrap: wrap; font-family: Georgia, serif; font-style: italic; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; display: inline-block; border: 1px solid var(--ink); }
+  .narration { background: var(--paper-deep); border: 1px solid var(--ink); border-left: 5px solid var(--cobalt); padding: 14px 16px; font-size: 17px; line-height: 1.6; margin-top: 14px; color: var(--ink); font-family: Georgia, serif; }
+  .narration b { color: var(--cobalt-deep); }
+
+  button {
+    background: var(--cobalt); color: var(--paper); border: 2px solid var(--ink); padding: 7px 16px; cursor: pointer;
+    font-size: 14px; font-family: 'EB Garamond', serif; font-variant: small-caps; letter-spacing: 2px;
+    box-shadow: 2px 2px 0 var(--ink); transition: transform .08s, box-shadow .08s;
+  }
+  button:hover { background: var(--cobalt-bright); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+  button:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+  button.ghost { background: var(--paper); color: var(--ink); }
+  button:disabled { opacity: .4; cursor: default; box-shadow: 2px 2px 0 var(--ink); transform: none; }
+
+  .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+  .controls input[type=range] { flex: 1; min-width: 200px; accent-color: var(--cobalt); }
+  .val { font-family: 'SF Mono', Menlo, monospace; font-size: 15px; color: var(--cobalt-deep); font-weight: 700; background: var(--paper); border: 1px solid var(--ink); padding: 3px 10px; min-width: 86px; text-align: center; }
+  .readout { margin-top: 12px; font-size: 16px; color: var(--ink); font-family: Georgia, serif; line-height: 1.5; }
+  .readout b { color: var(--cobalt-deep); }
+  .meter { height: 10px; background: var(--paper); border: 1px solid var(--ink); overflow: hidden; margin-top: 8px; }
+  .meter > div { height: 100%; background: var(--cobalt); width: 0; transition: width .15s; }
+  .stepcount { font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--ink-soft); }
+  .dots { display: inline-flex; gap: 6px; }
+  .dots i { width: 9px; height: 9px; background: var(--paper); border: 1px solid var(--ink); display: inline-block; }
+  .dots i.on { background: var(--cobalt); }
+  .cap { font-size: 17px; color: var(--ink); min-height: 48px; margin: 10px 0; line-height: 1.5; font-family: Georgia, serif; }
+  .cap b { color: var(--cobalt-deep); }
+
+  /* number-vector chips (extraction + frozen vector) */
+  .nvec { display: inline-flex; gap: 4px; padding: 5px 8px; border: 1.5px solid var(--ink); background: var(--paper); font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: var(--ink); align-items: center; }
+  .nvec .lab { color: var(--ink-soft); font-weight: 700; margin-right: 3px; font-size: 12px; }
+  .nvec .n { min-width: 32px; text-align: center; }
+  .nvec.e { border-color: #1a7f37; box-shadow: 2px 2px 0 rgba(26,127,55,0.35); }
+  .nvec.r { border-color: #b8860b; box-shadow: 2px 2px 0 rgba(184,134,11,0.35); }
+  .nvec.s { border-color: #7c3aed; background: #efe7fb; font-weight: 700; }
+  .nmany { display: flex; flex-wrap: wrap; gap: 6px; max-width: 360px; }
+  .feq { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .feq .op { font-size: 22px; font-family: 'Abril Fatface', serif; color: var(--cobalt); }
+  .prod { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+  .punit { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .mblk { padding: 8px 11px; border: 1.5px solid var(--ink); font-size: 14px; font-weight: 700; text-align: center; line-height: 1.25; font-family: Georgia, serif; }
+  .mblk small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-soft); font-family: 'SF Mono', Menlo, monospace; }
+  .mblk.e { background: #e3f3e7; } .mblk.r { background: #f6ecd6; } .mblk.t { background: #ece5fb; }
+  .pdown { font-size: 12px; color: var(--cobalt); font-family: 'SF Mono', Menlo, monospace; text-align: center; }
+  .pnl { align-self: center; color: var(--ink-soft); font-family: 'SF Mono', Menlo, monospace; font-size: 13px; padding-top: 12px; }
+  .qrow { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--ink-soft); margin: 4px 0; }
+  .qrow .qlab { color: var(--ink); font-weight: 700; }
+
+  /* read+steer tape */
+  .tape2 { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 12px 4px; }
+  .tblk { padding: 12px 16px; border: 1.5px solid var(--ink); text-align: center; font-weight: 700; font-size: 15px; box-shadow: 3px 3px 0 var(--ink); }
+  .tblk small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-soft); font-family: 'SF Mono', Menlo, monospace; }
+  .tblk.e { background: #e3f3e7; } .tblk.r { background: #f6ecd6; } .tblk.t { background: #ece5fb; }
+  .actsep { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .actsep .mk { font-size: 11px; color: var(--cobalt); font-family: 'EB Garamond', serif; font-variant: small-caps; letter-spacing: 1px; }
+  .actsep .pill { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; font-weight: 700; color: var(--cobalt); border: 2px solid var(--cobalt); background: var(--paper); padding: 9px 8px; box-shadow: 2px 2px 0 var(--ink); }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .twocol .box { border: 1.5px solid var(--ink); padding: 12px 14px; font-size: 16px; line-height: 1.45; background: var(--paper); }
+  .twocol .box b { display: block; margin-bottom: 4px; font-variant: small-caps; letter-spacing: 1px; }
+  .twocol .box.off { border-left: 6px solid var(--cobalt); }
+  .twocol .box.dec { border-left: 6px solid #b8860b; }
+
+  /* two-phase lanes */
+  .lane { border: 1.5px solid var(--ink); padding: 12px 14px; margin: 10px 0; background: var(--paper); }
+  .lane.off { border-left: 6px solid var(--cobalt); }
+  .lane.dec { border-left: 6px solid #b8860b; }
+  .lanehd { font-family: 'Abril Fatface', Georgia, serif; font-size: 20px; margin-bottom: 4px; }
+  .lanehd .off { color: var(--cobalt); } .lanehd .dec { color: #b8860b; }
+  .lanehd .when { font-family: 'EB Garamond', serif; font-variant: small-caps; letter-spacing: 1px; font-size: 14px; color: var(--ink-soft); margin-left: 8px; }
+  .dsbadge { font-size: 15px; padding: 8px 12px; margin-bottom: 10px; line-height: 1.4; border: 1px solid var(--ink); background: var(--paper-deep); }
+  .flow { display: flex; align-items: stretch; flex-wrap: wrap; }
+  .step { flex: 1; min-width: 96px; background: var(--paper-deep); border: 1.5px solid var(--ink); padding: 10px; text-align: center; font-size: 14px; box-shadow: 3px 3px 0 var(--ink); margin: 4px; display: flex; flex-direction: column; gap: 4px; justify-content: center; transition: box-shadow .15s, transform .15s; cursor: pointer; }
+  .step:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .lanecap { margin-top: 10px; border-top: 1px dashed var(--ink); padding-top: 10px; font-size: 16px; line-height: 1.5; color: var(--ink); font-family: Georgia, serif; min-height: 24px; }
+  .lanecap b { color: var(--cobalt-deep); }
+  .lanecap i { color: var(--ink-soft); }
+  .lanecap code { font-size: 0.85em; }
+  .step .ic { font-size: 22px; line-height: 1; }
+  .step small { color: var(--ink-soft); font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
+  .step.s { background: #efe7fb; border-color: #7c3aed; font-weight: 700; }
+  .step.glow { box-shadow: 0 0 0 3px var(--gold), 5px 5px 0 var(--ink); transform: translate(-2px,-2px); border-color: var(--cobalt); background: #fffbe9; }
+  .arr { display: flex; align-items: center; color: var(--cobalt); font-size: 22px; padding: 0 2px; font-family: 'Abril Fatface', serif; }
+  .bridge { text-align: center; color: #7c3aed; font-weight: 700; font-size: 16px; margin: 8px 0; font-family: Georgia, serif; }
+  .bridge .big { font-size: 30px; display: block; font-family: 'Abril Fatface', serif; }
+
+  /* ablation bars */
+  .seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .seg button.active { background: var(--cobalt-deep); }
+  .seg button.danger.active { background: #8a1c1c; border-color: var(--ink); }
+  .seg button.win.active { background: #1a7f37; border-color: var(--ink); }
+  .bars { display: flex; gap: 22px; justify-content: space-around; align-items: flex-end; padding: 26px 8px 0; border-bottom: 2px solid var(--ink); margin-top: 8px; }
+  .barcol { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+  .bartrack { height: 150px; display: flex; align-items: flex-end; width: 46px; }
+  .bar { width: 100%; transition: height .35s, background .25s; min-height: 2px; border: 1.5px solid var(--ink); }
+  .barval { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: var(--cobalt-deep); font-weight: 700; }
+  .barlbl { font-size: 13px; color: var(--ink-soft); text-align: center; font-style: italic; }
+  .bargroup { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .barpair { display: flex; gap: 10px; align-items: flex-end; }
+  .barunit { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .barunit .trk { height: 150px; display: flex; align-items: flex-end; width: 34px; }
+  .barunit .bar { width: 100%; transition: height .35s, background .25s; min-height: 2px; border: 1.5px solid var(--ink); }
+  .delta { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; font-weight: 700; }
+  .delta.up { color: #1a7f37; } .delta.down { color: #c0392b; } .delta.zero { color: var(--ink-soft); font-style: italic; font-weight: 400; }
+  .verdict2 { margin-top: 14px; font-size: 17px; color: var(--ink); min-height: 46px; font-family: Georgia, serif; line-height: 1.5; }
+  .verdict2 b { color: var(--cobalt-deep); }
+
+  table.setup { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 17px; }
+  table.setup td { padding: 9px 12px; border-bottom: 1px solid var(--ink); vertical-align: top; }
+  table.setup td.k { font-weight: 700; color: var(--cobalt-deep); width: 190px; font-variant: small-caps; letter-spacing: .5px; }
+  table.res { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 17px; font-family: 'SF Mono', Menlo, monospace; }
+  table.res th, table.res td { padding: 8px 10px; border-bottom: 1px solid var(--ink); text-align: right; }
+  table.res th:first-child, table.res td:first-child { text-align: left; font-family: Georgia, serif; }
+  table.res thead th { font-family: Georgia, serif; font-style: italic; color: var(--ink-soft); font-size: 14px; }
+  .good { color: #1a7f37; font-weight: 700; }
+
+  @media (max-width: 900px) { .twocol { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) {
+    header.hero h1 { font-size: 46px; }
+    .eqbig { font-size: 24px; }
+    .fc-step { padding-left: 24px; padding-top: 70px; }
+    .fc-step::before { width: 100%; right: -2px; }
+    .flow { flex-direction: column; } .arr { transform: rotate(90deg); }
+    .bars { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <div class="tag">N.º 2 — An interactive curriculum</div>
+    <h1>SEAL<em>— Steerable Reasoning Calibration —</em></h1>
+    <div class="masthead-rule">Chen et al. · COLM MMXXV</div>
+    <p>Reasoning models over-think — they re-check and restart far more than needed. SEAL finds a single "stay-on-task" direction inside the model's activations and nudges every thought toward it. No retraining: <span style="font-family:'SF Mono',monospace;">H′ = H + α·S</span>. This walkthrough builds that idea from the ground up.</p>
+    <p style="margin-top:14px; font-size:15px; font-style:italic;">Paper: <a href="https://arxiv.org/abs/2504.07986" target="_blank" rel="noopener">SEAL: Steerable Reasoning Calibration of Large Language Models for Free</a> · <a href="paper.pdf" target="_blank" rel="noopener">[PDF]</a></p>
+    <p style="margin-top:8px; font-size:14px;"><a href="../">← back to index</a></p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="inner">
+    <a href="#overview"><span class="num">◆</span>The pipeline</a>
+    <a href="#lesson1"><span class="num">1</span>Latent space</a>
+    <a href="#lesson2"><span class="num">2</span>The nudge</a>
+    <a href="#lesson3"><span class="num">3</span>Building S</a>
+    <a href="#lesson4"><span class="num">4</span>Two phases</a>
+    <a href="#lesson5"><span class="num">5</span>Experiments</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ===================== OVERVIEW ===================== -->
+<section class="lesson" id="overview">
+  <h2>What this paper is about</h2>
+  <p class="lead">A reasoning model already "knows" the difference between productive work and spinning its wheels — those live in different directions of its activation space. SEAL measures that direction once, then leans the model toward it at every thought boundary.</p>
+
+  <p>The method splits a model's chain-of-thought into three kinds of "thoughts" — <b>execution</b> (actual solving), <b>reflection</b> (re-checking), and <b>transition</b> (switching approach) — and shows reflection &amp; transition are mostly redundant. The whole pipeline, at a glance:</p>
+
+  <div class="flowchart">
+    <div class="fc-step" data-step="1">
+      <div class="fc-title">Thoughts are geometrically distinguishable (§3)</div>
+      <div class="fc-body">Read the hidden state at each thought's ending <code>\n\n</code>. In deep layers, execution thoughts separate cleanly from reflection/transition — so the "type" of thinking is readable.</div>
+    </div>
+    <div class="fc-arrow">▼</div>
+    <div class="fc-step" data-step="2">
+      <div class="fc-title">Build the steering vector S — offline, once</div>
+      <div class="fc-body">Average those hidden states by category and subtract: <span class="fc-mono">S = H̄<sub>E</sub> − H̄<sub>RT</sub></span> — a single frozen vector pointing from "over-thinking" toward "execution."</div>
+    </div>
+    <div class="fc-arrow">▼</div>
+    <div class="fc-step" data-step="3">
+      <div class="fc-title">Steer at decode — every query</div>
+      <div class="fc-body">At every <code>\n\n</code>, add it in: <span class="fc-mono">H′ = H + α·S</span>. Each nudge biases the next thought toward execution → shorter, more accurate reasoning.</div>
+    </div>
+  </div>
+
+  <div class="callout"><b>The payoff.</b> Up to +11% accuracy while cutting 12–50% of reasoning tokens — entirely from that one additive nudge, with no fine-tuning.</div>
+</section>
+
+<!-- ===================== LESSON 1 ===================== -->
+<section class="lesson" id="lesson1">
+  <h2>Lesson 1 — Reasoning patterns live in different places</h2>
+  <p class="lead">Before you can steer anything, you must prove the "kind" of thinking is encoded somewhere readable. SEAL shows it's encoded in the latent space — and that it gets clearer the deeper you look.</p>
+
+  <p>You can't spot over-thinking from the <b>words</b>: a reflection thought says wildly different things per question. So SEAL looks one level down, at the <b>hidden state</b> — the activation vector the model holds at a layer. The bet: the type of reasoning shows up as a <i>region</i> in that space.</p>
+
+  <div class="callout"><b>The probe.</b> Run DeepSeek-R1-Distill-Qwen-1.5B on Math-500. For each thought, grab the hidden state at the <code>\n\n</code> that ends it (layer <i>i</i>), project to 2-D with t-SNE, and look. Drag the slider to sweep layers 1→28.</p>
+
+  <div class="viz">
+    <div class="panel">
+      <h4>t-SNE of thought representations — drag the layer</h4>
+      <div class="vizdark"><svg id="ls-canvas" viewBox="0 0 600 360" style="width:100%;height:auto;display:block"></svg></div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#4ade80;"></span>execution — solving</span>
+        <span><span class="swatch" style="background:#e0852e;"></span>reflection — re-checking</span>
+        <span><span class="swatch" style="background:#a78bfa;"></span>transition — switching</span>
+      </div>
+      <div class="controls">
+        <span style="font-family:'EB Garamond',serif;font-variant:small-caps;letter-spacing:1px;">Layer</span>
+        <input id="ls-layer" type="range" min="1" max="28" step="1" value="1">
+        <span class="val" id="ls-layerVal">1 / 28</span>
+        <button id="ls-jump">Jump to 20</button>
+      </div>
+      <div class="readout" id="ls-readout"></div>
+      <div class="meter"><div id="ls-bar"></div></div>
+      <div class="barlbl" style="text-align:left;margin-top:6px;">separability of execution vs. the rest →</div>
+    </div>
+    <p style="font-size:14px;font-style:italic;color:var(--ink-soft);margin:12px 4px 0;">Conceptual reconstruction of the paper's Figure 3 (real plots use t-SNE on actual activations at layers 1, 5, 10, 15, 20, 28).</p>
+  </div>
+
+  <h3 class="subhead">The three findings</h3>
+  <ul>
+    <li><b>Execution stands apart.</b> At deep layers it barely overlaps the others — at <b>layer 20</b> it's almost fully separated. That's where SEAL later intervenes.</li>
+    <li><b>Depth sharpens it.</b> Early layers can't tell types apart; deep layers can — shallow = surface features, deep = abstract meaning.</li>
+    <li><b>Reflection ≈ Transition.</b> They stay close to each other even as both pull from execution, because both mean "reconsider."</li>
+  </ul>
+
+  <div class="takeaway"><b>Takeaway:</b> separable means measurable. Because the types occupy distinct regions, you can compute a direction pointing from "over-thinking" toward "execution" — and then push the model along it. That direction is <b>S</b>.</div>
+</section>
+
+<!-- ===================== LESSON 2 ===================== -->
+<section class="lesson" id="lesson2">
+  <h2>Lesson 2 — The nudge: H′ = H + α·S</h2>
+  <p class="lead">SEAL finds that "stay-on-task" direction and, at decode time, nudges the activations along it. The nudge is exactly this equation.</p>
+
+  <div class="eqbig"><span class="hp">H′</span> = H + <span class="a">α</span> · <span class="s">S</span></div>
+
+  <table class="setup">
+    <tr><td class="k">H</td><td>the hidden state — the model's "thought" as numbers, before steering</td></tr>
+    <tr><td class="k">H′</td><td>the steered hidden state — what flows on to the next layers and shapes the next token</td></tr>
+    <tr><td class="k">α (alpha)</td><td>a single strength knob. The paper uses <b>α = 1.0</b>; α = 0 means "do nothing"</td></tr>
+    <tr><td class="k">S</td><td>the steering vector — the fixed "be execution, not reflection/transition" direction from Lesson 1</td></tr>
+  </table>
+
+  <h3 class="subhead">Where S comes from</h3>
+  <p>Take the same <code>\n\n</code> hidden states, average within each category, then subtract:</p>
+  <div class="eqmid"><span class="s">S</span> = <span class="e">H̄<sub>E</sub></span> − <span class="r">H̄<sub>RT</sub></span> &nbsp; <span style="color:var(--ink-soft);font-style:italic;font-size:14px;">( H̄<sub>RT</sub> = mean of Reflection ∪ Transition )</span></div>
+  <p><b>S points from the average over-thinking thought toward the average on-task thought.</b> Adding it to H drags the state toward execution.</p>
+
+  <div class="viz">
+    <div class="panel">
+      <h4>Steering in activation space — drag α</h4>
+      <div class="vizdark"><svg id="st-canvas" viewBox="0 0 600 360" style="width:100%;height:auto;display:block"></svg></div>
+      <div class="controls">
+        <span style="font-family:'EB Garamond',serif;font-variant:small-caps;letter-spacing:1px;color:#b8860b;font-weight:700;">α</span>
+        <input id="st-alpha" type="range" min="0" max="2" step="0.05" value="1">
+        <span class="val" id="st-alphaVal">1.00</span>
+      </div>
+      <div class="readout" id="st-readout"></div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#4ade80;"></span>execution region</span>
+        <span><span class="swatch" style="background:#e0852e;"></span>reflection / transition</span>
+        <span><span class="swatch" style="background:#60a5fa;"></span>H′ (steered)</span>
+        <span><span class="swatch" style="background:#fbbf24;"></span>S direction</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway"><b>Takeaway:</b> it's just vector addition. Scale the "stay-on-task" direction S by α and add it to the current thought H. With α≈1 the state crosses out of the over-thinking cluster into execution — biasing what the model writes next.</div>
+</section>
+
+<!-- ===================== LESSON 3 ===================== -->
+<section class="lesson" id="lesson3">
+  <h2>Lesson 3 — How S is actually built</h2>
+  <p class="lead">The confusing part is "hidden state" and "averaging." Let's make both concrete — first the pipeline, then the same thing with real numbers.</p>
+
+  <h3 class="subhead">The extraction, step by step</h3>
+  <p>Each colored grid below is <b>one vector of numbers</b> — a cartoon of d≈3584 real values, shown as 10 cells.</p>
+  <div class="viz">
+    <div class="panel">
+      <div class="controls" style="margin-top:0;">
+        <button id="ex-prev">◀ Prev</button>
+        <button id="ex-next">Next ▶</button>
+        <span class="dots" id="ex-dots"></span>
+        <span class="stepcount" id="ex-count"></span>
+      </div>
+      <div class="cap" id="ex-cap"></div>
+      <div class="vizdark" id="ex-stage" style="min-height:200px;display:flex;align-items:center;justify-content:center;"></div>
+    </div>
+  </div>
+
+  <h3 class="subhead">One token does both jobs: the <code>\n\n</code> that ends each thought</h3>
+  <p>"First token <code>\n\n</code>" sounds like the start, but it's the <b>end</b>: a thought is the content <i>between</i> two <code>\n\n</code> separators, so the "first <code>\n\n</code>" is the separator right after the thought. Crucially, <b>the same token read offline is the token steered at decode.</b> SEAL only ever touches these boundary tokens — never the words.</p>
+  <div class="viz">
+    <div class="tape2">
+      <div class="tblk e">thought j<small>"… 7 × 6 = 42"</small></div>
+      <div class="actsep"><span class="mk">read + steer</span><span class="pill">\n\n</span></div>
+      <div class="tblk r">thought j+1<small>"Wait, let me check"</small></div>
+      <div class="actsep"><span class="mk">read + steer</span><span class="pill">\n\n</span></div>
+      <div class="tblk t">thought j+2<small>"Alternatively …"</small></div>
+    </div>
+    <p style="text-align:center;font-size:15px;font-style:italic;color:var(--ink-soft);margin:6px 0 12px;">SEAL acts only on the <code>\n\n</code> boundary tokens (layer 20) — every one of them. The thought text is never modified.</p>
+    <div class="twocol">
+      <div class="box off"><b>① Offline — read</b>At each <code>\n\n</code>, record the hidden state. Pile them up → average → <code>S</code>. <i>No steering here.</i></div>
+      <div class="box dec"><b>② Decode — write</b>At each <code>\n\n</code>, overwrite it: <code>H′ = H + α·S</code>. <i>This is the steering.</i></div>
+    </div>
+  </div>
+
+  <h3 class="subhead">So what is "one frozen vector"? (with real numbers)</h3>
+  <p>Forget 3584 numbers — pretend each hidden state is just <b>3 numbers</b>. Watch the whole pile turn into a single list, then get copied everywhere unchanged.</p>
+
+  <div class="flowchart">
+    <div class="fc-step" data-step="1">
+      <div class="fc-title">Where the pile comes from</div>
+      <div class="fc-body">
+        Take one <b>build-set</b> problem (MATH train). The model reasons; at each <code>\n\n</code> you read the layer-20 hidden state → one list of numbers (colored by the thought it ended).
+        <div class="prod" style="margin:12px 0;">
+          <div class="punit"><span class="mblk e">execution<small>"7 × 6 = 42"</small></span><span class="pdown">↓ read \n\n</span><span class="nvec e"><span class="n">.8</span><span class="n">.5</span><span class="n">.7</span></span></div>
+          <span class="pnl">\n\n</span>
+          <div class="punit"><span class="mblk r">reflection<small>"wait, recheck"</small></span><span class="pdown">↓ read \n\n</span><span class="nvec r"><span class="n">.3</span><span class="n">.3</span><span class="n">.2</span></span></div>
+          <span class="pnl">\n\n</span>
+          <div class="punit"><span class="mblk e">execution<small>"so 42 chairs"</small></span><span class="pdown">↓ read \n\n</span><span class="nvec e"><span class="n">.7</span><span class="n">.6</span><span class="n">.8</span></span></div>
+        </div>
+        <small>Now repeat for ~1000 problems ⇒ a big pile of lists:</small>
+        <div class="nmany" style="margin-top:8px;">
+          <span class="nvec e"><span class="n">.8</span><span class="n">.5</span><span class="n">.7</span></span>
+          <span class="nvec r"><span class="n">.3</span><span class="n">.3</span><span class="n">.2</span></span>
+          <span class="nvec e"><span class="n">.7</span><span class="n">.6</span><span class="n">.8</span></span>
+          <span class="nvec r"><span class="n">.2</span><span class="n">.4</span><span class="n">.3</span></span>
+          <span class="nvec e"><span class="n">.9</span><span class="n">.4</span><span class="n">.6</span></span>
+          <span class="nvec r"><span class="n">.4</span><span class="n">.2</span><span class="n">.1</span></span>
+          <span style="align-self:center;font-style:italic;color:var(--ink-soft);">…thousands more…</span>
+        </div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+    <div class="fc-step" data-step="2">
+      <div class="fc-title">Average + subtract → just one list</div>
+      <div class="fc-body">
+        Average all the green lists, average all the orange lists, subtract. The whole pile collapses into a single list — that's <code>S</code>.
+        <div class="feq" style="margin-top:10px;">
+          <span class="nvec e"><span class="lab">H̄ₑ</span><span class="n">.8</span><span class="n">.5</span><span class="n">.7</span></span>
+          <span class="op">−</span>
+          <span class="nvec r"><span class="lab">H̄ᵣₜ</span><span class="n">.3</span><span class="n">.3</span><span class="n">.2</span></span>
+          <span class="op">=</span>
+          <span class="nvec s"><span class="lab">S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+    <div class="fc-step" data-step="3">
+      <div class="fc-title">Freeze it — these numbers never change</div>
+      <div class="fc-body">
+        Save <code>S = [.5, .2, .5]</code> as a constant. It is not re-learned or updated while the model runs. "Frozen" = locked, permanent.
+        <div style="margin-top:10px;"><span class="nvec s"><span class="lab">🔒 S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span></div>
+      </div>
+    </div>
+    <div class="fc-arrow">▼</div>
+    <div class="fc-step" data-step="4">
+      <div class="fc-title">Add that same list at every \n\n, in every query</div>
+      <div class="fc-body">
+        A "query" = one question from the eval/test set (Math-500, GSM8k, …) or a real user — <b>not</b> a build-set problem. Different questions, but the numbers added are identical every time. <i>That</i> is "one frozen vector."
+        <div style="margin-top:10px;">
+          <div class="qrow"><span class="qlab">❓"What is 25 × 16?"</span> …thought… <span class="nvec s"><span class="lab">+S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span> …thought… <span class="nvec s"><span class="lab">+S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span></div>
+          <div class="qrow"><span class="qlab">❓"Is 91 prime?"</span> …thought… <span class="nvec s"><span class="lab">+S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span></div>
+          <div class="qrow"><span class="qlab">❓"Solve x² = 49"</span> …thought… <span class="nvec s"><span class="lab">+S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span> …thought… <span class="nvec s"><span class="lab">+S</span><span class="n">.5</span><span class="n">.2</span><span class="n">.5</span></span></div>
+          <div class="qrow"><span style="color:var(--ink-soft);">…and every future question…</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout"><b>The bathroom-scale version.</b> Your scale reads 0.5 kg heavy. You measure that error <i>once</i> and write "−0.5 kg" on a sticky note — that's your frozen value. Then every weigh-in forever, you subtract the same 0.5 kg. <code>S</code> is that sticky note — except it's 3 (really 3584) numbers, applied at every <code>\n\n</code>.</div>
+</section>
+
+<!-- ===================== LESSON 4 ===================== -->
+<section class="lesson" id="lesson4">
+  <h2>Lesson 4 — Two phases, two datasets</h2>
+  <p class="lead">The biggest confusion is <i>when</i> things happen. Offline runs once to manufacture S — and never steers. Decode runs every query and just reuses that frozen S. They even use different datasets.</p>
+
+  <div class="viz">
+    <p style="font-size:15px;font-style:italic;color:var(--ink-soft);margin:0 0 4px;">👉 Click any step to read what it does — the explanation appears right under its lane.</p>
+
+    <div class="lane off">
+      <div class="lanehd"><span class="off">① OFFLINE</span><span class="when">run once · no steering</span></div>
+      <div class="dsbadge">📦 <b>BUILD SET</b> — ~1000 problems from the MATH <b>training split</b> (used only to compute S; never scored)</div>
+      <div class="flow">
+        <div class="step" data-ph="o0"><span class="ic">📚</span>build-set<br>problems<small>MATH train</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="o1"><span class="ic">🤖</span>model reasons<small>split at \n\n</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="o2"><span class="ic">👁️</span>READ H<small>at each \n\n</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="o3"><span class="ic">Σ÷N</span>average<br>&amp; subtract<small>H̄ₑ − H̄ᵣₜ</small></div>
+        <div class="arr">→</div>
+        <div class="step s" data-ph="o4">S<small>🔒 frozen</small></div>
+      </div>
+      <div class="lanecap" id="cap-off"><i>Click a step above to see what it does.</i></div>
+    </div>
+
+    <div class="bridge"><span class="big">↓</span>the same frozen S, reused for every query</div>
+
+    <div class="lane dec">
+      <div class="lanehd"><span class="dec">② DECODE</span><span class="when">every query · steering happens here</span></div>
+      <div class="dsbadge">🎯 <b>EVAL / TEST SET</b> — held-out questions (Math-500, GSM8k, LiveCodeBench) or real users; never seen during build</div>
+      <div class="flow">
+        <div class="step" data-ph="d0"><span class="ic">❓</span>held-out<br>question<small>eval/test</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="d1"><span class="ic">🤖</span>generates<small>token by token</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="d2"><span class="ic">✏️</span>WRITE<br>H′ = H + α·S<small>at each \n\n</small></div>
+        <div class="arr">→</div>
+        <div class="step" data-ph="d3"><span class="ic">✅</span>shorter,<br>on-task<small>fewer tokens</small></div>
+      </div>
+      <div class="lanecap" id="cap-dec"><i>Click a step above to see what it does.</i></div>
+    </div>
+  </div>
+
+  <div class="callout"><b>Two different datasets.</b> S is built on the MATH <i>train</i> split and then steers <i>held-out test</i> questions — the build set and the eval set never overlap, so the reported scores aren't inflated.</div>
+
+  <div class="takeaway"><b>Takeaway:</b> offline = calibrate an instrument once in the lab (watch many runs, bottle one setting S); decode = apply that fixed setting to every new measurement in the field. Calibrate once, apply forever.</div>
+</section>
+
+<!-- ===================== LESSON 5 ===================== -->
+<section class="lesson" id="lesson5">
+  <h2>Lesson 5 — Experiments &amp; ablations</h2>
+  <p class="lead">Does it work, and is every design choice load-bearing? The setup, the headline results, and the ablation that justifies the formula.</p>
+
+  <h3 class="subhead">The setup</h3>
+  <table class="setup">
+    <tr><td class="k">Models</td><td>DeepSeek-R1-Distill-Qwen-1.5B &amp; 7B, and QwQ-32B-Preview</td></tr>
+    <tr><td class="k">Datasets</td><td>Math-500 (with a hard subset), GSM8k (1,319 problems), LiveCodeBench (400 Python problems)</td></tr>
+    <tr><td class="k">S source</td><td>extracted once from ~1000 MATH training samples; reused everywhere, including code</td></tr>
+    <tr><td class="k">Metrics</td><td>Accuracy@1 (↑) and #Tokens (↓); greedy decoding for reproducibility</td></tr>
+    <tr><td class="k">Baseline</td><td>Logits Penalty — lowers logits of words like "wait" / "alternatively" (best ≈ −3)</td></tr>
+  </table>
+
+  <h3 class="subhead">Headline results (Math-500)</h3>
+  <table class="res">
+    <thead><tr><th>Model</th><th>Acc (base→SEAL)</th><th>Tokens (base→SEAL)</th></tr></thead>
+    <tbody>
+      <tr><td>R1-Distill-Qwen-1.5B</td><td>67.0 → <span class="good">78.0</span></td><td>4526 → <span class="good">3154</span></td></tr>
+      <tr><td>R1-Distill-Qwen-7B</td><td>85.8 → <span class="good">89.4</span></td><td>3389 → <span class="good">2661</span></td></tr>
+      <tr><td>QwQ-32B-Preview</td><td>90.4 → <span class="good">91.0</span></td><td>2113 → <span class="good">1716</span></td></tr>
+    </tbody>
+  </table>
+  <p>Two arguments the experiments make: <b>latent &gt; token space</b> (Logits Penalty only kills specific tokens; the model just rephrases its over-thinking, so it even <i>increases</i> reworded reflection steps — SEAL suppresses the concept), and <b>S transfers</b> (a MATH-built vector still helps on GSM8k and on LiveCodeBench code).</p>
+
+  <h3 class="subhead">Ablation that justifies S = H̄<sub>E</sub> − H̄<sub>RT</sub></h3>
+  <p>Rebuild S to weaken different categories and watch accuracy (DeepSeek-R1-Distill-Qwen-7B). 👉 Click the variants:</p>
+  <div class="viz">
+    <div class="seg" id="ab-seg">
+      <button data-k="refl">Weaken Reflection</button>
+      <button data-k="trans">Weaken Transition</button>
+      <button data-k="exec" class="danger">Weaken Execution</button>
+      <button data-k="both" class="win">Weaken Both = SEAL</button>
+    </div>
+    <div class="bars" id="ab-bars"></div>
+    <div class="legend" style="margin-top:10px;justify-content:center;">
+      <span><span class="swatch" style="background:#a89a78;"></span>baseline (no steering)</span>
+      <span><span class="swatch" id="ab-legcolor" style="background:#1a7f37;"></span>selected variant</span>
+    </div>
+    <div class="barlbl" style="margin-top:6px;">Accuracy@1 across three datasets · DeepSeek-R1-Distill-Qwen-7B</div>
+    <div class="verdict2" id="ab-verdict"></div>
+  </div>
+  <p><b>What it proves:</b> weakening execution collapses accuracy (it's the real work); weakening reflection or transition alone helps a bit; weakening <b>both</b> helps most — so the optimal vector subtracts the combined reflection+transition mean, i.e. <code>H̄<sub>RT</sub></code>.</p>
+
+  <h3 class="subhead">Two more axes</h3>
+  <ul>
+    <li><b>Which layer?</b> S extracted from each layer is tested; mid-to-late layers win (concepts live there) → <b>layer 20</b>.</li>
+    <li><b>How hard (α)?</b> Larger α reliably cuts reflection/transition, but driving them to zero hurts — some rechecking helps. <b>α = 1.0</b> is consistently strong, so it's fixed everywhere.</li>
+  </ul>
+
+  <div class="takeaway"><b>Putting it together:</b> §3 proves "solving" and "second-guessing" sit in different regions; §4 measures the direction between them (S) and leans every thought boundary toward "keep working"; §5 confirms each choice — subtract <i>both</i> over-thinking types, steer a <i>middle</i> layer, with a <i>moderate</i> α. Steering, not retraining.</div>
+</section>
+
+</div>
+
+<script>
+/* ============ LESSON 1 — latent-space layer slider ============ */
+(function(){
+  const svg=document.getElementById('ls-canvas');
+  const NS='http://www.w3.org/2000/svg';
+  const EXEC='#4ade80',REFL='#e0852e',TRANS='#a78bfa',MUTED='#8a93a0',COBALT='#7aa2ff';
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  function rng(s){let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x);}
+  const CX=300,CY=185;
+  const C_EXEC={x:430,y:255}, C_REFL={x:200,y:130}, C_TRANS={x:235,y:115};
+  const N=34;
+  function makeGroup(seed){const pts=[];for(let i=0;i<N;i++){
+    const br=46*Math.sqrt(rng(seed+i)), bth=rng(seed+i*2.3)*6.283;
+    const base={x:CX+br*Math.cos(bth),y:CY+br*Math.sin(bth)};
+    const jr=24*Math.sqrt(rng(seed+i*5.1)), jth=rng(seed+i*7.7)*6.283;
+    pts.push({base,jx:jr*Math.cos(jth),jy:jr*Math.sin(jth)});}return pts;}
+  const G={exec:{c:C_EXEC,color:EXEC,pts:makeGroup(3)},
+           refl:{c:C_REFL,color:REFL,pts:makeGroup(60)},
+           trans:{c:C_TRANS,color:TRANS,pts:makeGroup(120)}};
+  const layer=document.getElementById('ls-layer'), layerVal=document.getElementById('ls-layerVal');
+  const readout=document.getElementById('ls-readout'), bar=document.getElementById('ls-bar');
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const sepFor=L=>1/(1+Math.exp(-9*((L-1)/27-0.5)));
+  function draw(){
+    svg.querySelectorAll('.dyn').forEach(n=>n.remove());
+    const L=parseInt(layer.value), sep=sepFor(L);
+    const sExec=Math.min(1,sep*1.12), sRT=sep*0.92;
+    function plot(g,s){for(const p of g.pts){
+      const tx=g.c.x+p.jx, ty=g.c.y+p.jy;
+      const x=lerp(p.base.x,tx,s), y=lerp(p.base.y,ty,s);
+      const c=el('circle',{cx:x,cy:y,r:4.2,fill:g.color,opacity:0.7});c.classList.add('dyn');svg.appendChild(c);}}
+    plot(G.exec,sExec);plot(G.refl,sRT);plot(G.trans,sRT);
+    if(sExec>0.45){const ring=el('circle',{cx:C_EXEC.x,cy:C_EXEC.y,r:34,fill:'none',stroke:EXEC,'stroke-width':1.5,'stroke-dasharray':'4 4',opacity:(sExec-0.45)*1.1});ring.classList.add('dyn');svg.appendChild(ring);}
+    const t1=el('text',{x:C_REFL.x-30,y:C_REFL.y-46,fill:MUTED,'font-size':12,'font-style':'italic'});t1.textContent='reflection / transition';t1.classList.add('dyn');svg.appendChild(t1);
+    const t2=el('text',{x:C_EXEC.x-26,y:C_EXEC.y+58,fill:MUTED,'font-size':12,'font-style':'italic'});t2.textContent='execution';t2.classList.add('dyn');svg.appendChild(t2);
+    layerVal.textContent=L+' / 28';
+    const pct=Math.round(sExec*100); bar.style.width=pct+'%';
+    let msg;
+    if(L<=5) msg='Shallow layer — the three thought types are <b>blended together</b>.';
+    else if(L<15) msg='Mid network — clusters <b>beginning to pull apart</b>.';
+    else if(L<24) msg='Deep layer — execution is <b>clearly separated</b>.';
+    else msg='Final layers — types are <b>well separated</b>.';
+    readout.innerHTML='Layer <b>'+L+'</b> · separability ≈ <b>'+pct+'%</b> · '+msg+(L===20?' &nbsp;<b>← SEAL intervenes here</b>':'');
+  }
+  layer.addEventListener('input',draw);
+  document.getElementById('ls-jump').addEventListener('click',()=>{layer.value=20;draw();});
+  draw();
+})();
+
+/* ============ LESSON 2 — steering alpha slider ============ */
+(function(){
+  const svg=document.getElementById('st-canvas');
+  const NS='http://www.w3.org/2000/svg';
+  const EXEC='#4ade80',REFL='#e0852e',TRANS='#a78bfa',GOLD='#fbbf24',HP='#60a5fa',MUTED='#8a93a0';
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  function rand(seed){let x=Math.sin(seed)*10000;return x-Math.floor(x);}
+  const RT={x:165,y:115}, E={x:430,y:255};
+  const S={x:(E.x-RT.x)/2.6,y:(E.y-RT.y)/2.6};
+  const H0={x:195,y:135};
+  function cluster(cx,cy,color,n,seed){for(let i=0;i<n;i++){
+    const r=42*Math.sqrt(rand(seed+i*1.7)), th=rand(seed+i*3.1)*Math.PI*2;
+    svg.appendChild(el('circle',{cx:cx+r*Math.cos(th),cy:cy+r*Math.sin(th),r:4,fill:color,opacity:.55}));}}
+  const alpha=document.getElementById('st-alpha'), alphaVal=document.getElementById('st-alphaVal');
+  const readout=document.getElementById('st-readout');
+  const defs=el('defs',{});
+  defs.innerHTML='<marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="'+GOLD+'"/></marker>'+
+  '<marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="'+HP+'"/></marker>';
+  svg.appendChild(defs);
+  function draw(){
+    svg.querySelectorAll('.dyn').forEach(n=>n.remove());
+    const a=parseFloat(alpha.value);
+    const Hp={x:H0.x+a*S.x,y:H0.y+a*S.y};
+    const sEnd={x:RT.x+S.x*2.2,y:RT.y+S.y*2.2};
+    const sArrow=el('line',{x1:RT.x,y1:RT.y,x2:sEnd.x,y2:sEnd.y,stroke:GOLD,'stroke-width':2,'stroke-dasharray':'5 5',opacity:.7,'marker-end':'url(#ah)'});
+    sArrow.classList.add('dyn');svg.appendChild(sArrow);
+    const sLbl=el('text',{x:sEnd.x+6,y:sEnd.y-4,fill:GOLD,'font-size':15,'font-weight':700});sLbl.textContent='S';sLbl.classList.add('dyn');svg.appendChild(sLbl);
+    const nudge=el('line',{x1:H0.x,y1:H0.y,x2:Hp.x,y2:Hp.y,stroke:HP,'stroke-width':3,'marker-end':'url(#ah2)'});nudge.classList.add('dyn');svg.appendChild(nudge);
+    const base=el('circle',{cx:H0.x,cy:H0.y,r:7,fill:'none',stroke:'#e6edf3','stroke-width':2,opacity:.85});base.classList.add('dyn');svg.appendChild(base);
+    const bl=el('text',{x:H0.x-26,y:H0.y-12,fill:'#e6edf3','font-size':14,'font-weight':700});bl.textContent='H';bl.classList.add('dyn');svg.appendChild(bl);
+    const hp=el('circle',{cx:Hp.x,cy:Hp.y,r:9,fill:HP,stroke:'#0c0e13','stroke-width':2});hp.classList.add('dyn');svg.appendChild(hp);
+    const hl=el('text',{x:Hp.x+12,y:Hp.y+5,fill:HP,'font-size':15,'font-weight':700});hl.textContent="H'";hl.classList.add('dyn');svg.appendChild(hl);
+    alphaVal.textContent=a.toFixed(2);
+    const dE=Math.hypot(Hp.x-E.x,Hp.y-E.y), dRT=Math.hypot(Hp.x-RT.x,Hp.y-RT.y);
+    let verdict;
+    if(a===0) verdict='No steering — the state sits in the <b>over-thinking</b> cluster.';
+    else if(dE<dRT) verdict='H′ has crossed into the <b>execution</b> region — biased toward staying on task.';
+    else verdict='Pushing toward execution, but not all the way — increase α.';
+    readout.innerHTML='α = <b>'+a.toFixed(2)+'</b> · offset added = α·S · '+verdict+(Math.abs(a-1)<1e-6?' &nbsp;<b>← paper default</b>':'');
+  }
+  cluster(RT.x,RT.y,REFL,26,2);
+  cluster(RT.x+20,RT.y+10,TRANS,22,40);
+  cluster(E.x,E.y,EXEC,30,9);
+  svg.appendChild(el('text',{x:RT.x-58,y:RT.y-50,fill:MUTED,'font-size':12,'font-style':'italic'})).textContent='reflection / transition';
+  svg.appendChild(el('text',{x:E.x-30,y:E.y+62,fill:MUTED,'font-size':12,'font-style':'italic'})).textContent='execution';
+  alpha.addEventListener('input',draw);
+  draw();
+})();
+
+/* ============ LESSON 3 — extraction stepper ============ */
+(function(){
+  const D=10;
+  const types=['e','r','e','t','e','r'];
+  function rng(s){let x=Math.sin(s*91.7+13.3)*43758.5;return x-Math.floor(x);}
+  const vecs=types.map((t,j)=>Array.from({length:D},(_,d)=>{
+    const base=t==='e'?0.62:0.34;
+    return Math.max(0,Math.min(1, base + (rng(j*13+d)-0.5)*0.7));
+  }));
+  const execIdx=types.map((t,i)=>i).filter(i=>types[i]==='e');
+  const rtIdx  =types.map((t,i)=>i).filter(i=>types[i]!=='e');
+  const mean=idx=>Array.from({length:D},(_,d)=>idx.reduce((s,i)=>s+vecs[i][d],0)/idx.length);
+  const cE=mean(execIdx), cRT=mean(rtIdx);
+  const S=cE.map((v,d)=>v-cRT[d]);
+  const Sm=Math.max(...S.map(Math.abs));
+  const valColor=v=>`hsl(199,68%,${20+v*52}%)`;
+  const diffColor=v=>v>=0?`hsl(134,55%,${28+(v/Sm)*40}%)`:`hsl(27,80%,${28+(Math.abs(v)/Sm)*40}%)`;
+  const TAG={e:'exec',r:'reflect',t:'transit'}, TCLS={e:'e',r:'r',t:'t'};
+  function vec(values,tag,tagCls,label,kind){
+    const col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:5px';
+    const t=document.createElement('div');t.style.cssText='font-family:"SF Mono",monospace;font-size:11px;padding:2px 7px;border:1px solid #444;color:#cdd6e0';t.textContent=tag;
+    const cells=document.createElement('div');cells.style.cssText='display:flex;flex-direction:column;gap:3px';
+    values.forEach(v=>{const c=document.createElement('div');c.style.cssText='width:26px;height:13px;border-radius:2px';c.style.background=kind==='diff'?diffColor(v):valColor(v);cells.appendChild(c);});
+    const l=document.createElement('div');l.style.cssText='font-size:11px;color:#8a93a0;font-family:"SF Mono",monospace';l.innerHTML=label;
+    col.appendChild(t);col.appendChild(cells);col.appendChild(l);return col;
+  }
+  function op(sym){const o=document.createElement('div');o.style.cssText='font-size:24px;color:#8a93a0;font-weight:700;align-self:center';o.textContent=sym;return o;}
+  const caps=[
+    'A finished reasoning trace, split at every <code>\\n\\n</code> into thoughts, each keyword-labeled <b>Execution</b>, <b>Reflection</b>, or <b>Transition</b>.',
+    'For each thought, read the hidden state at its ending <code>\\n\\n</code> (layer 20): a list of <b>d≈3584 numbers</b> (10 cells). Brighter = larger.',
+    'Sort the vectors into two buckets: <b>Execution</b> vs. <b>Reflection ∪ Transition</b>.',
+    'Take the <b>element-wise mean</b> of each bucket → one centroid each: <b>H̄ₑ</b> and <b>H̄ᵣₜ</b>.',
+    '<b>Subtract:</b> <code>S = H̄ₑ − H̄ᵣₜ</code>. Green = execution higher, orange = over-thinking higher. This difference vector is the steering direction.'
+  ];
+  function buildStage(step){
+    const wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:14px;flex-wrap:wrap;width:100%';
+    if(step===0){
+      wrap.style.alignItems='center';
+      types.forEach((t)=>{const chip=document.createElement('span');
+        chip.style.cssText='font-family:"SF Mono",monospace;font-size:12px;padding:6px 9px;border-radius:4px;'+(t==='e'?'background:rgba(74,222,128,.18);color:#86efac':t==='r'?'background:rgba(224,133,46,.18);color:#fbbf24':'background:rgba(167,139,250,.18);color:#c4b5fd');
+        chip.textContent={e:'Execution',r:'Reflection',t:'Transition'}[t];wrap.appendChild(chip);
+        const nl=document.createElement('span');nl.style.cssText='font-family:"SF Mono",monospace;font-size:12px;color:#586069';nl.textContent='\\n\\n';wrap.appendChild(nl);});
+    } else if(step===1){
+      types.forEach((t,i)=>wrap.appendChild(vec(vecs[i],TAG[t],TCLS[t],'H<sup>'+(i+1)+'</sup>','val')));
+    } else if(step===2){
+      const mk=(name,idx,col)=>{const b=document.createElement('div');b.style.cssText='border:1px solid #444;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px';
+        const h=document.createElement('div');h.style.cssText='font-size:12px;font-weight:700;color:'+col;h.textContent=name;b.appendChild(h);
+        const row=document.createElement('div');row.style.cssText='display:flex;gap:10px';idx.forEach(i=>row.appendChild(vec(vecs[i],TAG[types[i]],TCLS[types[i]],'H<sup>'+(i+1)+'</sup>','val')));b.appendChild(row);return b;};
+      wrap.appendChild(mk('Execution',execIdx,'#86efac'));wrap.appendChild(mk('Reflection ∪ Transition',rtIdx,'#fbbf24'));
+    } else if(step===3){
+      wrap.style.flexDirection='column';wrap.style.gap='20px';
+      [['Execution',execIdx,cE,'H̄ₑ'],['Reflection ∪ Transition',rtIdx,cRT,'H̄ᵣₜ']].forEach(([name,idx,cen,lab])=>{
+        const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:flex-end';
+        idx.forEach(i=>row.appendChild(vec(vecs[i],TAG[types[i]],TCLS[types[i]],'H<sup>'+(i+1)+'</sup>','val')));
+        row.appendChild(op('→'));row.appendChild(vec(cen,'mean','c',lab,'val'));wrap.appendChild(row);});
+    } else {
+      wrap.appendChild(vec(cE,'H̄ₑ','c','exec centroid','val'));
+      wrap.appendChild(op('−'));
+      wrap.appendChild(vec(cRT,'H̄ᵣₜ','c','RT centroid','val'));
+      wrap.appendChild(op('='));
+      wrap.appendChild(vec(S,'S','c','steering vector','diff'));
+    }
+    return wrap;
+  }
+  const stage=document.getElementById('ex-stage'),cap=document.getElementById('ex-cap'),dots=document.getElementById('ex-dots'),count=document.getElementById('ex-count');
+  const prev=document.getElementById('ex-prev'),next=document.getElementById('ex-next');
+  for(let i=0;i<caps.length;i++){dots.appendChild(document.createElement('i'));}
+  let step=0;
+  function show(){cap.innerHTML=caps[step];stage.innerHTML='';stage.appendChild(buildStage(step));
+    [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===step));
+    count.textContent='step '+(step+1)+' / '+caps.length;prev.disabled=step===0;next.disabled=step===caps.length-1;}
+  prev.onclick=()=>{if(step>0){step--;show();}};next.onclick=()=>{if(step<caps.length-1){step++;show();}};
+  show();
+})();
+
+/* ============ LESSON 4 — click any step, caption shows under its lane ============ */
+(function(){
+  const texts={
+    o0:'<b>Step 1.</b> Collect the build set: ~1000 problems from the MATH <b>training</b> split. This whole lane runs once and does <b>no steering</b> — it only builds S.',
+    o1:'<b>Step 2.</b> The model reasons through each problem; its output is split into thoughts at every <code>\\n\\n</code>.',
+    o2:'<b>Step 3.</b> At each <code>\\n\\n</code>, <b>read</b> (just record) the layer-20 hidden state. Nothing is changed here.',
+    o3:'<b>Step 4.</b> Average those recorded vectors by category and subtract: <code>H̄ₑ − H̄ᵣₜ</code>.',
+    o4:'<b>Step 5.</b> Out comes <b>S</b> — one fixed vector, now <b>frozen</b>. Offline is finished; we never run it again.',
+    d0:'<b>Step 1.</b> A held-out eval/test question arrives (Math-500, GSM8k, …) or a real user. This lane runs <b>every query</b>.',
+    d1:'<b>Step 2.</b> The model generates its answer token by token, as usual.',
+    d2:'<b>Step 3.</b> At each <code>\\n\\n</code>, <b>write</b> <code>H′ = H + α·S</code> — inject the same frozen S. <i>This is the steering.</i>',
+    d3:'<b>Step 4.</b> Each nudge biases the next thought toward execution → a shorter, on-task answer. Same S every query, no recomputation.'
+  };
+  const capOff=document.getElementById('cap-off'), capDec=document.getElementById('cap-dec');
+  document.querySelectorAll('.lane .step').forEach(step=>{
+    step.addEventListener('click',()=>{
+      document.querySelectorAll('.lane .step').forEach(s=>s.classList.remove('glow'));
+      step.classList.add('glow');
+      const ph=step.dataset.ph;
+      (ph[0]==='o'?capOff:capDec).innerHTML=texts[ph];
+    });
+  });
+})();
+
+/* ============ LESSON 5 — steering-type ablation ============ */
+(function(){
+  const DATA={
+    base: {v:[85.8,88.0,44.5], color:'#9aa7b4', msg:'<b>No steering</b> — the plain model, our reference line.'},
+    refl: {v:[88.6,88.4,50.7], color:'#e0852e', msg:'Weakening <b>reflection</b> alone <b>helps</b> on every dataset.'},
+    trans:{v:[87.8,88.5,49.0], color:'#a78bfa', msg:'Weakening <b>transition</b> alone also <b>helps</b>.'},
+    exec: {v:[65.0,79.6,27.5], color:'#c0392b', msg:'Weakening <b>execution collapses</b> accuracy (85.8→65.0). Execution is the actual work — never suppress it.'},
+    both: {v:[89.4,88.9,51.7], color:'#1a7f37', msg:'Weakening <b>both</b> is <b>best</b> on all three. This is SEAL — and why <code>S = H̄ₑ − H̄ᵣₜ</code>.'}
+  };
+  const LBL=['Math500','GSM8k','LiveCodeBench'];
+  const BASE='#a89a78';
+  const bars=document.getElementById('ab-bars'),verdict=document.getElementById('ab-verdict'),seg=document.getElementById('ab-seg');
+  const legColor=document.getElementById('ab-legcolor');
+  function unit(val,color){
+    const u=document.createElement('div');u.className='barunit';
+    const v=document.createElement('div');v.className='barval';v.textContent=val.toFixed(1);
+    const trk=document.createElement('div');trk.className='trk';
+    const bar=document.createElement('div');bar.className='bar';bar.style.height=val+'%';bar.style.background=color;
+    trk.appendChild(bar);
+    u.appendChild(v);u.appendChild(trk);return u;
+  }
+  function render(k){
+    const d=DATA[k];bars.innerHTML='';legColor.style.background=d.color;
+    d.v.forEach((val,i)=>{
+      const B=DATA.base.v[i];
+      const group=document.createElement('div');group.className='bargroup';
+      const pair=document.createElement('div');pair.className='barpair';
+      pair.appendChild(unit(B,BASE));
+      pair.appendChild(unit(val,d.color));
+      group.appendChild(pair);
+      const name=document.createElement('div');name.className='barlbl';name.textContent=LBL[i];group.appendChild(name);
+      const diff=+(val-B).toFixed(1);
+      const del=document.createElement('div');
+      del.className='delta '+(k==='base'?'zero':diff>0?'up':diff<0?'down':'zero');
+      del.textContent=k==='base'?'reference':(diff>0?'+'+diff:diff);
+      group.appendChild(del);
+      bars.appendChild(group);
+    });
+    verdict.innerHTML=d.msg;
+    [...seg.children].forEach(b=>b.classList.toggle('active',b.dataset.k===k));
+  }
+  seg.addEventListener('click',e=>{const b=e.target.closest('button');if(b)render(b.dataset.k);});
+  render('both');
+})();
+</script>
+</body>
+</html>
