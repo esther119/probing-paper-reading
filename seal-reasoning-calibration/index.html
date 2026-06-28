@@ -235,8 +235,15 @@
   .barcol { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
   .bartrack { height: 150px; display: flex; align-items: flex-end; width: 46px; }
   .bar { width: 100%; transition: height .35s, background .25s; min-height: 2px; border: 1.5px solid var(--ink); }
-  .barval { font-family: 'SF Mono', Menlo, monospace; font-size: 15px; color: var(--cobalt-deep); font-weight: 700; }
+  .barval { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; color: var(--cobalt-deep); font-weight: 700; }
   .barlbl { font-size: 13px; color: var(--ink-soft); text-align: center; font-style: italic; }
+  .bargroup { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .barpair { display: flex; gap: 10px; align-items: flex-end; }
+  .barunit { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .barunit .trk { height: 150px; display: flex; align-items: flex-end; width: 34px; }
+  .barunit .bar { width: 100%; transition: height .35s, background .25s; min-height: 2px; border: 1.5px solid var(--ink); }
+  .delta { font-family: 'SF Mono', Menlo, monospace; font-size: 14px; font-weight: 700; }
+  .delta.up { color: #1a7f37; } .delta.down { color: #c0392b; } .delta.zero { color: var(--ink-soft); font-style: italic; font-weight: 400; }
   .verdict2 { margin-top: 14px; font-size: 17px; color: var(--ink); min-height: 46px; font-family: Georgia, serif; line-height: 1.5; }
   .verdict2 b { color: var(--cobalt-deep); }
 
@@ -583,7 +590,11 @@
       <button data-k="both" class="win">Weaken Both = SEAL</button>
     </div>
     <div class="bars" id="ab-bars"></div>
-    <div class="barlbl" style="margin-top:8px;">Accuracy@1 across three datasets · DeepSeek-R1-Distill-Qwen-7B</div>
+    <div class="legend" style="margin-top:10px;justify-content:center;">
+      <span><span class="swatch" style="background:#a89a78;"></span>baseline (no steering)</span>
+      <span><span class="swatch" id="ab-legcolor" style="background:#1a7f37;"></span>selected variant</span>
+    </div>
+    <div class="barlbl" style="margin-top:6px;">Accuracy@1 across three datasets · DeepSeek-R1-Distill-Qwen-7B</div>
     <div class="verdict2" id="ab-verdict"></div>
   </div>
   <p><b>What it proves:</b> weakening execution collapses accuracy (it's the real work); weakening reflection or transition alone helps a bit; weakening <b>both</b> helps most — so the optimal vector subtracts the combined reflection+transition mean, i.e. <code>H̄<sub>RT</sub></code>.</p>
@@ -806,17 +817,33 @@
     both: {v:[89.4,88.9,51.7], color:'#1a7f37', msg:'Weakening <b>both</b> is <b>best</b> on all three. This is SEAL — and why <code>S = H̄ₑ − H̄ᵣₜ</code>.'}
   };
   const LBL=['Math500','GSM8k','LiveCodeBench'];
+  const BASE='#a89a78';
   const bars=document.getElementById('ab-bars'),verdict=document.getElementById('ab-verdict'),seg=document.getElementById('ab-seg');
+  const legColor=document.getElementById('ab-legcolor');
+  function unit(val,color){
+    const u=document.createElement('div');u.className='barunit';
+    const v=document.createElement('div');v.className='barval';v.textContent=val.toFixed(1);
+    const trk=document.createElement('div');trk.className='trk';
+    const bar=document.createElement('div');bar.className='bar';bar.style.height=val+'%';bar.style.background=color;
+    trk.appendChild(bar);
+    u.appendChild(v);u.appendChild(trk);return u;
+  }
   function render(k){
-    const d=DATA[k];bars.innerHTML='';
+    const d=DATA[k];bars.innerHTML='';legColor.style.background=d.color;
     d.v.forEach((val,i)=>{
-      const col=document.createElement('div');col.className='barcol';
-      const v=document.createElement('div');v.className='barval';v.textContent=val.toFixed(1);
-      const track=document.createElement('div');track.className='bartrack';
-      const bar=document.createElement('div');bar.className='bar';bar.style.height=val+'%';bar.style.background=d.color;
-      track.appendChild(bar);
-      const lbl=document.createElement('div');lbl.className='barlbl';lbl.textContent=LBL[i];
-      col.appendChild(v);col.appendChild(track);col.appendChild(lbl);bars.appendChild(col);
+      const B=DATA.base.v[i];
+      const group=document.createElement('div');group.className='bargroup';
+      const pair=document.createElement('div');pair.className='barpair';
+      pair.appendChild(unit(B,BASE));
+      pair.appendChild(unit(val,d.color));
+      group.appendChild(pair);
+      const name=document.createElement('div');name.className='barlbl';name.textContent=LBL[i];group.appendChild(name);
+      const diff=+(val-B).toFixed(1);
+      const del=document.createElement('div');
+      del.className='delta '+(k==='base'?'zero':diff>0?'up':diff<0?'down':'zero');
+      del.textContent=k==='base'?'reference':(diff>0?'+'+diff:diff);
+      group.appendChild(del);
+      bars.appendChild(group);
     });
     verdict.innerHTML=d.msg;
     [...seg.children].forEach(b=>b.classList.toggle('active',b.dataset.k===k));
