@@ -212,7 +212,12 @@
   .lanehd .when { font-family: 'EB Garamond', serif; font-variant: small-caps; letter-spacing: 1px; font-size: 14px; color: var(--ink-soft); margin-left: 8px; }
   .dsbadge { font-size: 15px; padding: 8px 12px; margin-bottom: 10px; line-height: 1.4; border: 1px solid var(--ink); background: var(--paper-deep); }
   .flow { display: flex; align-items: stretch; flex-wrap: wrap; }
-  .step { flex: 1; min-width: 96px; background: var(--paper-deep); border: 1.5px solid var(--ink); padding: 10px; text-align: center; font-size: 14px; box-shadow: 3px 3px 0 var(--ink); margin: 4px; display: flex; flex-direction: column; gap: 4px; justify-content: center; transition: box-shadow .15s, transform .15s; }
+  .step { flex: 1; min-width: 96px; background: var(--paper-deep); border: 1.5px solid var(--ink); padding: 10px; text-align: center; font-size: 14px; box-shadow: 3px 3px 0 var(--ink); margin: 4px; display: flex; flex-direction: column; gap: 4px; justify-content: center; transition: box-shadow .15s, transform .15s; cursor: pointer; }
+  .step:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .lanecap { margin-top: 10px; border-top: 1px dashed var(--ink); padding-top: 10px; font-size: 16px; line-height: 1.5; color: var(--ink); font-family: Georgia, serif; min-height: 24px; }
+  .lanecap b { color: var(--cobalt-deep); }
+  .lanecap i { color: var(--ink-soft); }
+  .lanecap code { font-size: 0.85em; }
   .step .ic { font-size: 22px; line-height: 1; }
   .step small { color: var(--ink-soft); font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
   .step.s { background: #efe7fb; border-color: #7c3aed; font-weight: 700; }
@@ -500,13 +505,7 @@
   <p class="lead">The biggest confusion is <i>when</i> things happen. Offline runs once to manufacture S — and never steers. Decode runs every query and just reuses that frozen S. They even use different datasets.</p>
 
   <div class="viz">
-    <div class="controls" style="margin-top:0;">
-      <button id="ph-play">▶ Play guided tour</button>
-      <button id="ph-reset" class="ghost">Reset</button>
-      <span class="stepcount" id="ph-count"></span>
-    </div>
-    <p style="font-size:14px;font-style:italic;color:var(--ink-soft);margin:8px 0 0;">Optional: lights up each box below in order and explains it — watch S get built (offline), then applied (decode). Or just read the two lanes yourself.</p>
-    <div class="cap narration" id="ph-cap" style="min-height:40px;"></div>
+    <p style="font-size:15px;font-style:italic;color:var(--ink-soft);margin:0 0 4px;">👉 Click any step to read what it does — the explanation appears right under its lane.</p>
 
     <div class="lane off">
       <div class="lanehd"><span class="off">① OFFLINE</span><span class="when">run once · no steering</span></div>
@@ -522,6 +521,7 @@
         <div class="arr">→</div>
         <div class="step s" data-ph="o4">S<small>🔒 frozen</small></div>
       </div>
+      <div class="lanecap" id="cap-off"><i>Click a step above to see what it does.</i></div>
     </div>
 
     <div class="bridge"><span class="big">↓</span>the same frozen S, reused for every query</div>
@@ -538,6 +538,7 @@
         <div class="arr">→</div>
         <div class="step" data-ph="d3"><span class="ic">✅</span>shorter,<br>on-task<small>fewer tokens</small></div>
       </div>
+      <div class="lanecap" id="cap-dec"><i>Click a step above to see what it does.</i></div>
     </div>
   </div>
 
@@ -771,29 +772,28 @@
   show();
 })();
 
-/* ============ LESSON 4 — two-phase walk-through ============ */
+/* ============ LESSON 4 — click any step, caption shows under its lane ============ */
 (function(){
-  const steps=[
-    ['o0','<b>OFFLINE</b> — collect the build set: ~1000 problems from the MATH <b>training</b> split. Runs once; does <b>no steering</b>.'],
-    ['o1','The model reasons through each one; output is split into thoughts at every <code>\\n\\n</code>.'],
-    ['o2','At each <code>\\n\\n</code>, <b>read</b> (record) the layer-20 hidden state. Nothing is changed.'],
-    ['o3','Average those vectors by category and subtract: <code>H̄ₑ − H̄ᵣₜ</code>.'],
-    ['o4','Out comes <b>S</b> — one fixed vector, now <b>frozen</b>. Offline is done.'],
-    ['d0','<b>DECODE</b> — a held-out eval/test question arrives (Math-500, GSM8k, …) or a real user. Runs <b>every query</b>; steering happens here.'],
-    ['d1','The model generates its answer token by token.'],
-    ['d2','At each <code>\\n\\n</code>, <b>write</b> <code>H′ = H + α·S</code> — inject the same frozen S.'],
-    ['d3','Each nudge biases the next thought toward execution → a shorter, on-task answer. Same S every query.']
-  ];
-  const cap=document.getElementById('ph-cap'),count=document.getElementById('ph-count');
-  const play=document.getElementById('ph-play'),reset=document.getElementById('ph-reset');
-  function clear(){document.querySelectorAll('.lane .step').forEach(s=>s.classList.remove('glow'));}
-  let timer=null,i=0;
-  function showStep(n){clear();const [id,txt]=steps[n];const e=document.querySelector('.lane .step[data-ph="'+id+'"]');if(e)e.classList.add('glow');cap.innerHTML=txt;count.textContent='step '+(n+1)+' / '+steps.length;}
-  function stop(){if(timer){clearInterval(timer);timer=null;}play.textContent='▶ Walk through';}
-  function run(){stop();i=0;showStep(i);play.textContent='⏸ Playing…';timer=setInterval(()=>{i++;if(i>=steps.length){stop();return;}showStep(i);},1900);}
-  play.onclick=()=>{if(timer){stop();}else{run();}};
-  reset.onclick=()=>{stop();clear();cap.innerHTML='';count.textContent='';};
-  cap.innerHTML='<i>The narration for each step will appear here once you press “Play guided tour.”</i>';
+  const texts={
+    o0:'<b>Step 1.</b> Collect the build set: ~1000 problems from the MATH <b>training</b> split. This whole lane runs once and does <b>no steering</b> — it only builds S.',
+    o1:'<b>Step 2.</b> The model reasons through each problem; its output is split into thoughts at every <code>\\n\\n</code>.',
+    o2:'<b>Step 3.</b> At each <code>\\n\\n</code>, <b>read</b> (just record) the layer-20 hidden state. Nothing is changed here.',
+    o3:'<b>Step 4.</b> Average those recorded vectors by category and subtract: <code>H̄ₑ − H̄ᵣₜ</code>.',
+    o4:'<b>Step 5.</b> Out comes <b>S</b> — one fixed vector, now <b>frozen</b>. Offline is finished; we never run it again.',
+    d0:'<b>Step 1.</b> A held-out eval/test question arrives (Math-500, GSM8k, …) or a real user. This lane runs <b>every query</b>.',
+    d1:'<b>Step 2.</b> The model generates its answer token by token, as usual.',
+    d2:'<b>Step 3.</b> At each <code>\\n\\n</code>, <b>write</b> <code>H′ = H + α·S</code> — inject the same frozen S. <i>This is the steering.</i>',
+    d3:'<b>Step 4.</b> Each nudge biases the next thought toward execution → a shorter, on-task answer. Same S every query, no recomputation.'
+  };
+  const capOff=document.getElementById('cap-off'), capDec=document.getElementById('cap-dec');
+  document.querySelectorAll('.lane .step').forEach(step=>{
+    step.addEventListener('click',()=>{
+      document.querySelectorAll('.lane .step').forEach(s=>s.classList.remove('glow'));
+      step.classList.add('glow');
+      const ph=step.dataset.ph;
+      (ph[0]==='o'?capOff:capDec).innerHTML=texts[ph];
+    });
+  });
 })();
 
 /* ============ LESSON 5 — steering-type ablation ============ */
