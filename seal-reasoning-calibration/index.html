@@ -583,7 +583,6 @@
   <p>Rebuild S to weaken different categories and watch accuracy (DeepSeek-R1-Distill-Qwen-7B). 👉 Click the variants:</p>
   <div class="viz">
     <div class="seg" id="ab-seg">
-      <button data-k="base">Baseline</button>
       <button data-k="refl">Weaken Reflection</button>
       <button data-k="trans">Weaken Transition</button>
       <button data-k="exec" class="danger">Weaken Execution</button>
@@ -849,7 +848,7 @@
     [...seg.children].forEach(b=>b.classList.toggle('active',b.dataset.k===k));
   }
   seg.addEventListener('click',e=>{const b=e.target.closest('button');if(b)render(b.dataset.k);});
-  render('base');
+  render('both');
 })();
 </script>
 </body>
